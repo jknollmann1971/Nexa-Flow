@@ -1,12 +1,10 @@
-// k-flow-card.js – Unified Edition v7.1.1
-// Fixes:
-//   - Inverter name, system limits, EV battery capacity now use
-//     explicit <ha-textfield> inputs (impossible to miss).
-//   - PV3 & PV4 merged under one toggle "Extra PV Strings".
-//   - Battery current & power moved outside battery icon:
-//     power above flow‑bar, current below; dual battery stacked.
-//   - Sun always stays on the arc.
-//   - All previous features preserved.
+// k-flow-card.js – Unified Edition v7.4.0
+// Changes v7.4.0:
+//   - Labels section: switchRow replaced by header chip (+ Enable / ✓ Enabled style).
+//   - Per-row auto-enable: each entity picker unlocks only when its label text ≠ default.
+//   - Corresponding Battery/Solar pickers lock per-row (not globally).
+//   - _updateDynamic: clean _rowActive + _readNum/_readStr helpers (replaces old monolithic labelsOn check).
+//   - _set: re-renders on any of the 6 label text key changes.
 
 // ═══════════════════════════════════════════════════════════════
 // VISUAL EDITOR
@@ -55,7 +53,11 @@ class KFlowCardEditor extends HTMLElement {
     if (this._config[key] === value) return;
     this._config = { ...this._config, [key]: value };
     this._fireChanged();
-    if (key === '_show_battery' || key === '_show_battery2' || key === '_show_pv_extra' || key === '_show_ev' || key === '_show_limits' || key === '_labels_custom_entities')
+    if (key === '_show_battery' || key === '_show_battery2' || key === '_show_pv_extra' ||
+        key === '_show_ev'      || key === '_show_limits'   || key === '_labels_custom_entities' ||
+        key === 'label_cell_temp_minmax' || key === 'label_bms_temp'   ||
+        key === 'label_min_cell'         || key === 'label_max_cell'   ||
+        key === 'label_batt_dis'         || key === 'label_total_pv_gen')
       this._render();
   }
 
@@ -364,10 +366,9 @@ class KFlowCardEditor extends HTMLElement {
       textField('inverter_name', 'Inverter Name', 'e.g. My Inverter'),
     ]));
 
-    // ── Labels section with "Enable custom entities" toggle ──
-    // When _labels_custom_entities is true, pickers inside labels are active
-    // AND the corresponding entity pickers in their native sections are disabled
-    // (greyed out with a pointer-events:none overlay) to prevent duplication.
+    // ── Labels: global gate + per-row activation ──
+    // Gate: section chip toggles _labels_custom_entities (body hidden when off).
+    // Per-row: entity picker activates only when that row's label text differs from its default.
     const labelsEnabled = !!(cfg._labels_custom_entities);
 
     // Helper: entity picker that can be visually disabled
@@ -396,31 +397,34 @@ class KFlowCardEditor extends HTMLElement {
       return wrap;
     };
 
-    // Patch existing pickers in battery1 / battery2 / grid sections if labels are enabled.
-    // We achieve this by overriding picker() locally for those sections — but since sections
-    // are already appended later, we pass `labelsEnabled` as a flag to the section builders.
-    // Store it so section builders below can use it.
-    this._labelsEnabled = labelsEnabled;
+    // Per-row active: true when global gate is ON and label text ≠ default
+    const _labelChanged = (key, def) => labelsEnabled && (cfg[key] || def) !== def;
+    const cellTempActive   = _labelChanged('label_cell_temp_minmax', 'CELL TEMP MIN/MAX');
+    const bmsTempActive    = _labelChanged('label_bms_temp',         'BMS TEMP');
+    const minCellActive    = _labelChanged('label_min_cell',         'Min Cell');
+    const maxCellActive    = _labelChanged('label_max_cell',         'Max Cell');
+    const battDisActive    = _labelChanged('label_batt_dis',         'Batt Dis.');
+    const totalPvGenActive = _labelChanged('label_total_pv_gen',     'TOTAL PV GEN.');
 
-    // Label rows — each has a text field + entity picker below it
-    const labelRow = (textKey, textLabel, textPlaceholder, entityKey) => {
+    // Label rows — text field + entity picker; picker active only when row is active
+    const labelRow = (textKey, textLabel, textPlaceholder, entityKey, active = false) => {
       const frag = document.createDocumentFragment();
       frag.appendChild(textField(textKey, textLabel, textPlaceholder));
       const entityRow = document.createElement('div');
       entityRow.style.cssText = 'margin-top:-6px;margin-bottom:14px;';
       const entityLabel = document.createElement('div');
       entityLabel.style.cssText = 'font-size:.72rem;color:var(--secondary-text-color);padding:0 2px 3px;line-height:1;';
-      entityLabel.textContent = 'Entity (overrides default)';
+      entityLabel.textContent = active ? 'Entity (overrides default)' : 'Entity — change label to unlock';
       const sel = document.createElement('ha-selector');
       sel.hass = this._hass;
       sel.selector = { entity: {} };
       sel.value = cfg[entityKey] || '';
       sel._configKey = entityKey;
       sel.style.cssText = 'width:100%;display:block;';
-      if (!labelsEnabled) {
+      if (!active) {
         sel.style.opacity = '0.4';
         sel.style.pointerEvents = 'none';
-        sel.title = 'Enable custom entities first';
+        sel.title = 'Change the label text above to unlock this entity picker';
       }
       sel.addEventListener('value-changed', (ev) => {
         ev.stopPropagation();
@@ -434,28 +438,23 @@ class KFlowCardEditor extends HTMLElement {
       return wrapper;
     };
 
-    // Info banner above label rows
+    // Info banner
     const labelInfoBanner = (() => {
       const info = document.createElement('div');
       info.style.cssText = 'font-size:.72rem;line-height:1.5;color:var(--secondary-text-color);background:var(--secondary-background-color,rgba(0,0,0,.04));border:1px solid var(--divider-color,rgba(0,0,0,.10));border-radius:7px;padding:7px 10px;margin-bottom:10px;';
-      info.innerHTML = '&#x1F4A1; <strong>Tip:</strong> The first six boxes let you rename the battery stat tiles to anything you like. Enable <em>Custom Entities</em> below to also override which sensor each tile reads &mdash; matching fields in Battery sections will then lock to prevent duplication.';
+      info.innerHTML = '&#x1F4A1; <strong>Tip:</strong> Rename a tile label to unlock its entity override. The matching sensor in the Battery section will lock automatically to prevent duplication.';
       return info;
     })();
 
     shell.appendChild(makeSection('labels', '🏷️', 'Labels', [
       labelInfoBanner,
-      switchRow('_labels_custom_entities', '🔗 Enable custom entities',
-        'When ON, entity pickers below activate and their counterparts in Battery sections are locked to prevent duplication.'),
-      (() => { const d = document.createElement('div'); d.className='divider'; return d; })(),
-      labelRow('label_cell_temp_minmax', 'Cell Temp Min/Max label', 'CELL TEMP MIN/MAX', 'label_entity_cell_temp'),
-      labelRow('label_bms_temp',         'BMS Temp label',          'BMS TEMP',          'label_entity_bms_temp'),
-      labelRow('label_endurance',        'Endurance label',         'ENDURANCE',         'label_entity_endurance'),
-      labelRow('label_min_cell',         'Min Cell label',          'Min Cell',          'label_entity_min_cell'),
-      labelRow('label_max_cell',         'Max Cell label',          'Max Cell',          'label_entity_max_cell'),
-      labelRow('label_batt_dis',         'Batt Dis label',          'Batt Dis.',         'label_entity_batt_dis'),
-      labelRow('label_endu_eta',         'Endu ETA label',          'Battery Volt',      'label_entity_endu_eta'),
-      labelRow('label_total_pv_gen',     'Total PV Gen label',      'TOTAL PV GEN.',     'total_pv_gen_entity'),
-    ]));
+      labelRow('label_cell_temp_minmax', 'Cell Temp Min/Max label', 'CELL TEMP MIN/MAX', 'label_entity_cell_temp', cellTempActive),
+      labelRow('label_bms_temp',         'BMS Temp label',          'BMS TEMP',          'label_entity_bms_temp',  bmsTempActive),
+      labelRow('label_min_cell',         'Min Cell label',          'Min Cell',          'label_entity_min_cell',  minCellActive),
+      labelRow('label_max_cell',         'Max Cell label',          'Max Cell',          'label_entity_max_cell',  maxCellActive),
+      labelRow('label_batt_dis',         'Batt Dis label',          'Batt Dis.',         'label_entity_batt_dis',  battDisActive),
+      labelRow('label_total_pv_gen',     'Total PV Gen label',      'TOTAL PV GEN.',     'total_pv_gen_entity',    totalPvGenActive),
+    ], { toggleKey: '_labels_custom_entities', toggleOn: labelsEnabled, hidden: !labelsEnabled }));
 
     shell.appendChild(makeSection('solar', '☀️', 'Solar', [
       picker('pv1_power', 'PV1 Power'),
@@ -477,7 +476,7 @@ class KFlowCardEditor extends HTMLElement {
       picker('consump',         'House Consumption'),
       divider(),
       textField('label_total_pv_gen', 'Total PV Generation label', 'TOTAL PV GEN.'),
-      pickerMaybeDisabled('total_pv_gen_entity', 'Total PV Generation', labelsEnabled),
+      pickerMaybeDisabled('total_pv_gen_entity', 'Total PV Generation', totalPvGenActive),
     ]));
 
     shell.appendChild(makeSection('grid', '🔌', 'Grid', [
@@ -495,13 +494,13 @@ class KFlowCardEditor extends HTMLElement {
       picker('battery_soc',      'Battery SOC'),
       picker('battery_power',    'Battery Power'),
       picker('battery_current',  'Battery Current'),
-      pickerMaybeDisabled('battery_voltage',  'Battery Voltage',    labelsEnabled),
-      pickerMaybeDisabled('battery_temp1',    'Temp 1',             labelsEnabled),
-      pickerMaybeDisabled('battery_temp2',    'Temp 2',             labelsEnabled),
-      pickerMaybeDisabled('battery_mos',      'BMS Temp',           labelsEnabled),
-      pickerMaybeDisabled('battery_min_cell', 'Min Cell Voltage',   labelsEnabled),
-      pickerMaybeDisabled('battery_max_cell', 'Max Cell Voltage',   labelsEnabled),
-      pickerMaybeDisabled('batt_dis',         'Discharge Today',    labelsEnabled),
+      picker('battery_voltage',  'Battery Voltage'),
+      pickerMaybeDisabled('battery_temp1',    'Temp 1',             cellTempActive),
+      pickerMaybeDisabled('battery_temp2',    'Temp 2',             cellTempActive),
+      pickerMaybeDisabled('battery_mos',      'BMS Temp',           bmsTempActive),
+      pickerMaybeDisabled('battery_min_cell', 'Min Cell Voltage',   minCellActive),
+      pickerMaybeDisabled('battery_max_cell', 'Max Cell Voltage',   maxCellActive),
+      pickerMaybeDisabled('batt_dis',         'Discharge Today',    battDisActive),
       divider(),
       picker('goodwe_battery_soc',  'Fallback SOC',     true),
       picker('goodwe_battery_curr', 'Fallback Current', true),
@@ -513,8 +512,8 @@ class KFlowCardEditor extends HTMLElement {
       picker('battery2_soc',      'SOC'),
       picker('battery2_power',    'Power'),
       picker('battery2_current',  'Current'),
-      pickerMaybeDisabled('battery2_voltage', 'Voltage',  labelsEnabled),
-      pickerMaybeDisabled('battery2_mos',     'BMS Temp', labelsEnabled),
+      picker('battery2_voltage', 'Voltage'),
+      pickerMaybeDisabled('battery2_mos',     'BMS Temp', bmsTempActive),
     ], { toggleKey: '_show_battery2', toggleOn: showBatt2, hidden: !showBatt2 }));
 
     shell.appendChild(makeSection('limits', '⚙️', 'System Limits', [
@@ -603,16 +602,13 @@ class KFlowCard extends HTMLElement {
       label_min_cell: 'Min Cell',
       label_max_cell: 'Max Cell',
       label_batt_dis: 'Batt Dis.',
-      label_endu_eta: 'Battery Volt',
       total_pv_gen_entity: 'sensor.goodwe_total_pv_generation',
       label_total_pv_gen: 'TOTAL PV GEN.',
       label_entity_cell_temp: '',
       label_entity_bms_temp: '',
-      label_entity_endurance: '',
       label_entity_min_cell: '',
       label_entity_max_cell: '',
       label_entity_batt_dis: '',
-      label_entity_endu_eta: '',
       _labels_custom_entities: false,
       grid_power_alt: 'sensor.grid_phase_a_power',
       _show_battery: true,
@@ -654,6 +650,20 @@ class KFlowCard extends HTMLElement {
   _tempColor(t) { return t<=25?'#3fb950':t<=45?'#f0883e':'#f85149'; }
   _remCapColor(p) { return p<=15?'#e34d4c':p<=30?'#f39c4b':p<=55?'#f4d03f':'#2ecc71'; }
   _fmtTime(h) { if(!isFinite(h)||h<=0) return'--';const hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh+'h '+(mm<10?'0':'')+mm+'m'; }
+  _fmtEndurance(h) {
+    if (!isFinite(h) || h <= 0) return '--';
+    const days = Math.floor(h / 24), hrs = Math.floor(h % 24), mins = Math.round((h - Math.floor(h)) * 60);
+    if (days > 0) return days + 'd ' + hrs + 'h';
+    return hrs + 'h ' + (mins < 10 ? '0' : '') + mins + 'm';
+  }
+  _fmtTill(h) {
+    if (!isFinite(h) || h <= 0) return 'Till --';
+    const target = new Date(Date.now() + h * 3600000);
+    const day = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][target.getDay()];
+    let hr = target.getHours(); const ampm = hr >= 12 ? 'PM' : 'AM';
+    hr = hr % 12 || 12;
+    return 'Till ' + day + ' ' + hr + ':' + target.getMinutes().toString().padStart(2,'0') + ' ' + ampm;
+  }
 
   _sunData() {
     const attrs = this._hass?.states[this.config.sun || 'sun.sun']?.attributes;
@@ -727,16 +737,12 @@ class KFlowCard extends HTMLElement {
     const battTextSingle = `
       <text id="battPwrFlow" x="75" y="165" font-size="10" font-weight="600" fill="#cde">-- W</text>
       <text id="battCurrFlow" x="75" y="196" font-size="10" font-weight="600" fill="#fff">-- A</text>
-      <text id="bEnduEtaLabel" x="8" y="300" text-anchor="start" font-size="9" fill="#8b949e" letter-spacing="0.5">ENDU</text>
-      <text id="bEnduranceSvg" x="8" y="314" text-anchor="start" font-size="11" font-weight="600" fill="#8b949e">--</text>
     `;
     const battTextDual = `
       <text id="battPwrFlow1" x="75" y="158" font-size="10" font-weight="600" fill="#cde">-- W</text>
       <text id="battPwrFlow2" x="75" y="171" font-size="10" font-weight="600" fill="#cde">-- W</text>
       <text id="battCurrFlow1" x="75" y="196" font-size="10" font-weight="600" fill="#fff">-- A</text>
       <text id="battCurrFlow2" x="75" y="209" font-size="10" font-weight="600" fill="#fff">-- A</text>
-      <text id="bEnduEtaLabel" x="8" y="313" text-anchor="start" font-size="9" fill="#8b949e" letter-spacing="0.5">ENDU</text>
-      <text id="bEnduranceSvg" x="8" y="327" text-anchor="start" font-size="11" font-weight="600" fill="#8b949e">--</text>
     `;
 
     const batteryTip = `<rect x="75" y="126" width="18" height="4" rx="2" fill="url(#battCapGrad)"/>`;
@@ -897,12 +903,21 @@ class KFlowCard extends HTMLElement {
         <div class="st"><div class="l">${this.config.label_max_cell || 'Max Cell'}</div><div class="v" id="bMaxCell">-- V</div></div>
         <div class="st"><div class="l">${this.config.label_batt_dis || 'Batt Dis.'}</div><div class="v" id="bBattDis">-- kWh</div></div>
       </div>
+      <div style="margin-top:4px">
+        <div class="st" style="display:flex;flex-direction:row;align-items:flex-end;justify-content:space-between;gap:8px;padding:8px 9px 8px;width:100%;box-sizing:border-box">
+          <div class="l" id="bEnduStatLbl" style="margin-bottom:0;white-space:nowrap;line-height:1.4">${this.config.label_endurance || 'ENDURANCE'}</div>
+          <div style="display:flex;align-items:flex-end;gap:10px;flex-shrink:0">
+            <div class="v" id="bEnduranceStat" style="font-size:.88rem;line-height:1.2">--</div>
+            <div id="bEnduranceTime" style="font-size:.58rem;color:#8b949e;letter-spacing:.3px;white-space:nowrap;line-height:1.4">Till --</div>
+          </div>
+        </div>
+      </div>
       <div class="dv"></div>
       <div class="ct">☀️ Inverter</div>
       <div class="pvf">
         <div class="pvi"><div class="ico">☀️</div><div class="lbl">Today PV</div><div class="val yw" id="invTodayPv">-- kWh</div></div>
         <div class="pvi"><div class="ico">🔋</div><div class="lbl">Chg / Dis</div><div class="val" id="invTodayBattChg">-- kWh</div><div class="val" id="invTodayBattDis" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
-        <div class="pvi"><div class="ico">⚡</div><div class="lbl">Remaining</div><div class="val" id="invRemCap">-- Ah</div></div>
+        <div class="pvi"><div class="ico">⚡</div><div class="lbl">Remaining</div><div class="val" id="invRemCap">-- Ah</div><div class="val" id="invRemKwh" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
         <div class="pvi"><div class="ico">🏡</div><div class="lbl">Today Load</div><div class="val" id="invTodayLoad">-- kWh</div></div>
       </div>
     </div>`;
@@ -1064,9 +1079,7 @@ class KFlowCard extends HTMLElement {
       if (bolt2) bolt2.setAttribute('opacity', (battPwr2 > 10 && Math.abs(battPwr2) >= 10) ? '1' : '0');
       setText('bTemp1', temp1_1.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' °C');
       setText('bTemp2', mos1.toFixed(1) + ' / ' + mos2.toFixed(1) + ' °C');
-      setText('bMinCell', minCell1.toFixed(3) + ' V');
-      setText('bMaxCell', maxCell1.toFixed(3) + ' V');
-      setText('bBattDis', battDis1 + ' kWh');
+      // bMinCell, bMaxCell, bBattDis handled by label override block below
     } else {
       const fill = this._battFill(battSoc1);
       const bf = getEl('battFillBar'); if (bf) { bf.setAttribute('y', fill.y); bf.setAttribute('height', fill.height); bf.setAttribute('fill', fill.color); bf.setAttribute('filter', fill.filter); }
@@ -1078,43 +1091,35 @@ class KFlowCard extends HTMLElement {
       const bolt = getEl('battBoltGroup'); if (bolt) bolt.setAttribute('opacity', (battPwr1 > 10 && absPwr1 >= 10) ? '1' : '0');
       setText('bTemp1', temp1_1.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' °C');
       setText('bTemp2', mos1.toFixed(1) + ' °C');
-      setText('bMinCell', minCell1.toFixed(3) + ' V');
-      setText('bMaxCell', maxCell1.toFixed(3) + ' V');
-      setText('bBattDis', battDis1 + ' kWh');
+      // bMinCell, bMaxCell, bBattDis handled by label override block below
     }
 
-    // Color: cell temp and cell voltage tiles
-    const _bT1 = getEl('bTemp1'); if (_bT1) _bT1.style.color = this._cellTempColor(Math.max(temp1_1, temp2_1));
-    const _bT2 = getEl('bTemp2'); if (_bT2) _bT2.style.color = this._cellTempColor(dual ? Math.max(mos1, mos2) : mos1);
-    const _bMn = getEl('bMinCell'); if (_bMn) _bMn.style.color = this._cellVoltColor(minCell1);
-    const _bMx = getEl('bMaxCell'); if (_bMx) _bMx.style.color = this._cellVoltColor(maxCell1);
+    // Color and value for cell tiles — handled by label override block below
 
     // Endurance
-    let endText = '--', endColor = '#8b949e';
+    let endHours = null, endText = '--', endColor = '#8b949e', isETA = false;
+    const _socPct = (remCap1 / fullAh) * 100;
     if (dual) {
       const remCap2 = (battSoc2 / 100) * fullAh;
       const totalRemWh = (remCap1/fullAh*fullWh) + (remCap2/fullAh*fullWh);
       const totalPower = battPwr1 + battPwr2;
       if (totalPower < -10) {
-        const left = totalRemWh / Math.abs(totalPower);
-        const ec = left >= 5 ? '#4ade80' : '#f85149';
-        endText = this._fmtTime(left); endColor = ec;
+        endHours = totalRemWh / Math.abs(totalPower);
+        endText = this._fmtEndurance(endHours); endColor = this._remCapColor(_socPct);
       } else if (totalPower > 10) {
-        const totalWh = fullWh * 2;
-        const missingWh = totalWh - totalRemWh;
-        const eta = Math.max(0, missingWh / totalPower);
-        endText = 'ETA ' + this._fmtTime(eta); endColor = '#00d7ff';
+        const missingWh = fullWh * 2 - totalRemWh;
+        endHours = Math.max(0, missingWh / totalPower);
+        endText = this._fmtEndurance(endHours); endColor = '#00d7ff'; isETA = true;
       }
     } else {
       const remWh = (remCap1 / fullAh) * fullWh;
       if (battPwr1 < -10) {
-        const left = remWh / Math.abs(battPwr1);
-        const ec = left >= 5 ? '#4ade80' : '#f85149';
-        endText = this._fmtTime(left); endColor = ec;
+        endHours = remWh / Math.abs(battPwr1);
+        endText = this._fmtEndurance(endHours); endColor = this._remCapColor(_socPct);
       } else if (battPwr1 > 10) {
         const missingWh = ((fullAh - remCap1) / fullAh) * fullWh;
-        const eta = Math.max(0, missingWh / Math.abs(battPwr1));
-        endText = 'ETA ' + this._fmtTime(eta); endColor = '#00d7ff';
+        endHours = Math.max(0, missingWh / Math.abs(battPwr1));
+        endText = this._fmtEndurance(endHours); endColor = '#00d7ff'; isETA = true;
       }
     }
     // Total PV Generation stat tile
@@ -1132,12 +1137,6 @@ class KFlowCard extends HTMLElement {
         _totalPvGenEl.style.color = '#8b949e';
       }
     }
-    // SVG label + value below battery icon (ENDU/ETA)
-    const _bEndSvg = getEl('bEnduranceSvg');
-    if (_bEndSvg) { _bEndSvg.textContent = endText.replace(/^ETA /, ''); _bEndSvg.setAttribute('fill', endColor); }
-    const _enduLbl = getEl('bEnduEtaLabel');
-    if (_enduLbl) { _enduLbl.textContent = endText.startsWith('ETA') ? 'ETA' : 'ENDU'; _enduLbl.setAttribute('fill', endColor); }
-
     const pwrBar = getEl('pwrBar');
     if (pwrBar) {
       pwrBar.style.width = Math.min(absPwr1 / invMax * 100, 100).toFixed(1) + '%';
@@ -1176,9 +1175,70 @@ class KFlowCard extends HTMLElement {
     setText('invTodayBattChg', todayBattChg + ' kWh');
     setText('invTodayBattDis', battDis1 + ' kWh');
     setText('invTodayLoad', todayLoad + ' kWh');
+    // ── Remaining Ah + kWh ──
     const totalRemAh = remCap1 + (dual ? (battSoc2 / 100) * fullAh : 0);
+    const avgVolt = dual && battVolt2 > 0 ? (battVolt1 + battVolt2) / 2 : battVolt1;
+    const totalRemKwh = avgVolt > 0 ? (totalRemAh * avgVolt / 1000) : null;
     const invRemCapEl = getEl('invRemCap');
-    if (invRemCapEl) { invRemCapEl.textContent = totalRemAh.toFixed(1) + ' Ah'; invRemCapEl.style.color = this._remCapColor((remCap1 / fullAh) * 100); }
+    const invRemKwhEl = getEl('invRemKwh');
+    const remColor = this._remCapColor((remCap1 / fullAh) * 100);
+    if (invRemCapEl) { invRemCapEl.textContent = totalRemAh.toFixed(1) + ' Ah'; invRemCapEl.style.color = remColor; }
+    if (invRemKwhEl) {
+      invRemKwhEl.textContent = totalRemKwh !== null ? totalRemKwh.toFixed(2) + ' kWh' : '-- kWh';
+      invRemKwhEl.style.color = remColor;
+    }
+
+    // ── Label entity overrides for stat tiles ──
+    // Per-row: override active only when global gate ON AND label text ≠ its default
+    const labelsOn = !!(this.config._labels_custom_entities);
+    const _rowActive = (labelKey, def) => labelsOn && (this.config[labelKey] || def) !== def;
+    const _readNum  = (entityKey, fallback) => {
+      const s = this._hass && this._hass.states[this.config[entityKey]];
+      return s ? parseFloat(s.state) || fallback : fallback;
+    };
+    const _readStr  = (entityKey, fallback) => {
+      const s = this._hass && this._hass.states[this.config[entityKey]];
+      return s ? s.state : fallback;
+    };
+    // Cell temp — single entity replaces entire temp1/temp2 display when active
+    const cellTempCustom = _rowActive('label_cell_temp_minmax', 'CELL TEMP MIN/MAX') && this.config.label_entity_cell_temp;
+    const temp1Final  = cellTempCustom ? _readNum('label_entity_cell_temp', temp1_1) : temp1_1;
+    // BMS temp
+    const mosFinal    = (_rowActive('label_bms_temp', 'BMS TEMP')  && this.config.label_entity_bms_temp)
+      ? _readNum('label_entity_bms_temp', mos1)   : mos1;
+    // Min cell
+    const minCellFinal = (_rowActive('label_min_cell', 'Min Cell') && this.config.label_entity_min_cell)
+      ? _readNum('label_entity_min_cell', minCell1) : minCell1;
+    // Max cell
+    const maxCellFinal = (_rowActive('label_max_cell', 'Max Cell') && this.config.label_entity_max_cell)
+      ? _readNum('label_entity_max_cell', maxCell1) : maxCell1;
+    // Batt dis
+    const battDisFinal = (_rowActive('label_batt_dis', 'Batt Dis.') && this.config.label_entity_batt_dis)
+      ? _readStr('label_entity_batt_dis', battDis1) : battDis1;
+    // Apply overrides to stat tiles
+    const _bT1o = getEl('bTemp1');
+    if (_bT1o) {
+      if (cellTempCustom) {
+        _bT1o.textContent = temp1Final.toFixed(1) + ' °C';
+        _bT1o.style.color = this._cellTempColor(temp1Final);
+      } else {
+        _bT1o.textContent = temp1Final.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' °C';
+        _bT1o.style.color = this._cellTempColor(Math.max(temp1Final, temp2_1));
+      }
+    }
+    const _bT2o = getEl('bTemp2'); if (_bT2o) { _bT2o.textContent = mosFinal.toFixed(1) + (dual ? ' / ' + mos2.toFixed(1) : '') + ' °C'; _bT2o.style.color = this._cellTempColor(dual ? Math.max(mosFinal, mos2) : mosFinal); }
+    const _bMno = getEl('bMinCell'); if (_bMno) { _bMno.textContent = minCellFinal.toFixed(3) + ' V'; _bMno.style.color = this._cellVoltColor(minCellFinal); }
+    const _bMxo = getEl('bMaxCell'); if (_bMxo) { _bMxo.textContent = maxCellFinal.toFixed(3) + ' V'; _bMxo.style.color = this._cellVoltColor(maxCellFinal); }
+    const _bDiso = getEl('bBattDis'); if (_bDiso) _bDiso.textContent = battDisFinal + ' kWh';
+
+    // ── HTML stat tile — endurance ──
+    const _tillStr = this._fmtTill(endHours);
+    const _bEnduStat = getEl('bEnduranceStat');
+    if (_bEnduStat) { _bEnduStat.textContent = (isETA ? 'ETA ' : '') + endText; _bEnduStat.style.color = endColor; }
+    const _bEnduStatLbl = getEl('bEnduStatLbl');
+    if (_bEnduStatLbl) _bEnduStatLbl.textContent = isETA ? 'ETA' : (this.config.label_endurance || 'ENDURANCE');
+    const _bEnduTimeEl = getEl('bEnduranceTime');
+    if (_bEnduTimeEl) { _bEnduTimeEl.textContent = _tillStr; _bEnduTimeEl.style.color = endHours !== null ? endColor : '#8b949e'; }
 
     const pvBlocks = getEl('pvBlocks');
     if (pvBlocks) { const lit = Math.round((pvTotal / pvMax) * 20); const heights = [20, 35, 50, 60, 70, 80, 90, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100]; let html = ''; for (let i = 0; i < 20; i++) html += `<div style="flex:1;background:${i < lit ? 'rgba(255,255,255,0.55)' : '#21262d'};height:${i < lit ? heights[i] : 100}%;opacity:${i < lit ? 1 : 0.35};border-radius:2px;"></div>`; pvBlocks.innerHTML = html; }
@@ -1235,6 +1295,6 @@ window.customCards.push({
   name: 'K-Flow Card',
   description: 'Solar Energy Flow Card',
   preview: true,
-  version: '7.1.1',
+  version: '7.4.0',
 });
 customElements.define('k-flow-card', KFlowCard);
