@@ -34,19 +34,15 @@ The card combines an SVG energy-flow canvas (sun arc, animated flow paths, inver
 
 ### Method 1 — HACS (Recommended)
 
-`k-flow-card` is available in the HACS Community Store.
-
-1. Open HACS in your Home Assistant sidebar.
-2. Go to **Frontend**.
-3. Click the **+ Explore & Download Repositories** button.
-4. Search for **k-flow-card**.
-5. Click **Download** and confirm.
-6. **Hard refresh** your browser (`Ctrl + Shift + R` / `Cmd + Shift + R`).
-7. Add to a dashboard view:
-   ```yaml
-   type: custom:k-flow-card
-   ```
-8. Open the visual editor to configure entities.
+1. In HACS, go to **Frontend → ⋮ → Custom repositories**
+2. Paste: `https://github.com/thekhan1122/k-flow-card` (without `.git`)
+3. Category: **Lovelace**
+4. Install the card – the resource is added automatically.
+5. Click the **+ Explore & Download Repositories** button.
+6. Search for **k-flow-card**.
+7. Click **Download** the resource is added automatically.
+8. **Hard refresh** your browser (`Ctrl + Shift + R` / `Cmd + Shift + R`).
+9. Open the visual editor to configure entities.
 
 > HACS handles resource registration automatically. No manual resource entry needed.
 
