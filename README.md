@@ -214,61 +214,12 @@ All keys are configured through the visual editor. The YAML equivalents are list
 ## Changelog
 
 ### v1.0.0
-- **Labels section â€” header chip toggle** (same style as Secondary Battery, Extra PV, EV, Limits sections). Body is hidden when disabled.
-- **Per-row auto-enable logic:** each label row's entity picker activates independently â€” only when that row's text has been changed from its default value. No global unlock needed.
-- **Per-row Battery/Solar locking:** corresponding pickers in Battery and Solar Extras sections lock individually when their label row is active, not all-at-once.
-- `_updateDynamic` refactored: dead `_readEntity` helper removed; replaced with clean `_rowActive`, `_readNum`, `_readStr` helpers.
-- `_set` now triggers a re-render on any of the 6 label text key changes (live editor feedback).
-
-### v7.3.0
-- **Labels editor** reduced to exactly 6 rows matching the 2Ã—3 stat tile grid.
-- `label_endurance` text field removed from editor (endurance tile exists on card but label is fixed).
-- `label_endu_eta` / `label_entity_endu_eta` row removed from editor.
-- **Battery voltage** (`battery_voltage`, `battery2_voltage`) is never locked â€” always freely editable regardless of Labels state.
-- **Cell Temp override:** when a custom entity is selected, tile shows a single value only (no `temp1 / temp2` pair).
-- **Endurance tile** layout: full card width, vertically compact row, all content bottom-aligned (`align-items:flex-end`).
-- Dead stub config keys purged: `label_endu_eta`, `label_entity_endu_eta`, `label_entity_cell_temp2`, `label_entity_endurance`.
-
-### v7.2.1
-- **Endurance tile** redesigned from narrow column to full-width single row (horizontally full, vertically compact).
-- **Cell Temp Min/Max** entity override: added second entity picker (`label_entity_cell_temp2`) to allow independent min/max overrides. *(Superseded in v7.3.0)*
-
-### v7.2.0
-- **Labels section** introduced with `switchRow` global toggle for custom entities.
-- Six stat tiles made label-customisable: Cell Temp Min/Max, BMS Temp, Min Cell, Max Cell, Batt Dis, Total PV Gen.
-- `pickerMaybeDisabled` helper added â€” renders override veil on Battery section pickers when Labels global toggle is ON.
-- Battery voltage pickers exempted from locking.
-- Info banner added above label rows.
-
-### v7.1.x
-- **Dual battery** support: Secondary Battery section with independent SOC, power, current, voltage, BMS temp.
-- Battery current and power values moved outside the battery icon SVG: power displayed above flow bar, current below.
-- Dual battery values stacked in stat tiles where applicable (e.g. `mos1 / mos2`).
-
-### v7.0.x
-- **EV / Car Charger** node added to SVG canvas with animated flow path, SOC arc, and ETA display.
-- `_show_ev` chip toggle added to editor.
-- Charger state machine: `charging`, `completed`, `finished`, `disconnected` with colour and icon changes.
-
-### v6.x
-- **Extra PV Strings** (PV3 + PV4) merged under one `_show_pv_extra` chip toggle (previously two separate toggles).
-- **System Limits** section added with numeric fields: battery Ah, battery Wh, inverter max, PV max.
-- `_show_limits` chip toggle added.
-- `inverter_name` moved to General section as `ha-textfield` input.
-- `charger_battery_capacity_wh` and other numeric fields migrated to explicit `ha-textfield` / `numberField` inputs.
-
-### v5.x
-- Sun arc introduced: sun SVG node tracks real elevation angle from `sun.sun`, stays pinned on the arc path.
-- Animated S-curve flow paths replacing straight lines.
-- Cross / T-shape layout established: sun arc at top â†’ inverter centre â†’ Battery left, Grid right, Home below.
-- Static SVG rebuilt via `_buildStaticSVG()` on `setConfig`; dynamic updates isolated to `_updateDynamic()`.
-
-### v4.x and earlier
-- Initial card structure: basic SVG energy flow with Growatt Nexa + JK BMS entity mapping.
-- Visual editor scaffolded with `makeSection`, `picker`, `textField`, `switchRow` helpers.
-- `ha-selector` entity pickers introduced.
-- SOC colour logic, cell temp/voltage colour helpers defined.
-- Endurance calculation introduced (hours remaining based on current draw / charge rate).
+- Initial release of `nexa-flow-card`
+- Fully custom Home Assistant Lovelace card for Growatt Nexa solar inverter systems
+- Animated energy-flow diagram (solar, inverter, battery, grid, home, EV)
+- Built-in visual editor (no YAML required)
+- Supports dual battery telemetry, extra PV strings, system limits, and customizable stat tiles
+- Includes dynamic data-reading for Nexa specific sensors (Work Mode, Island Mode, Battery Health, Battery Cycles)
 
 ---
 
