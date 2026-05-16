@@ -482,7 +482,7 @@ class NexaFlowCardEditor extends HTMLElement {
     ]));
 
     shell.appendChild(makeSection('grid', 'ðŸ”Œ', 'Grid', [
-      switchRow('invert_grid_power', 'ðŸ”„ Invert grid power sign', 'Enable if positive = exporting (e.g. GoodWe active_power)'),
+      switchRow('invert_grid_power', 'ðŸ”„ Invert grid power sign', 'Enable if positive = exporting (e.g. Growatt Nexa active_power)'),
       divider(),
       picker('grid_active_power',  'Grid Active Power'),
       picker('grid_import_energy', 'Grid Import Energy'),
@@ -506,8 +506,8 @@ class NexaFlowCardEditor extends HTMLElement {
       pickerMaybeDisabled('battery_max_cell', 'Max Cell Voltage',   maxCellActive),
       pickerMaybeDisabled('batt_dis',         'Discharge Today',    battDisActive),
       divider(),
-      picker('goodwe_battery_soc',  'Fallback SOC',     true),
-      picker('goodwe_battery_curr', 'Fallback Current', true),
+      picker('fallback_battery_soc',  'Fallback SOC',     true),
+      picker('fallback_battery_curr', 'Fallback Current', true),
     ], { toggleKey: '_show_battery', toggleOn: showBatt1, hidden: !showBatt1 }));
 
     shell.appendChild(makeSection('battery2', 'ðŸ”‹', 'Secondary Battery', [
@@ -578,21 +578,21 @@ class NexaFlowCard extends HTMLElement {
       nexa_batt_cycles: 'sensor.growatt_0hvrb0zr23jt00yy_battery_cycle_count',
       
       // Restliche Standards...
-      pv1_power: 'sensor.goodwe_pv1_power',
-      pv2_power: 'sensor.goodwe_pv2_power',
+      pv1_power: 'sensor.growatt_pv1_power',
+      pv2_power: 'sensor.growatt_pv2_power',
       pv3_power: '',
       pv4_power: '',
-      grid_import_energy: 'sensor.goodwe_today_energy_import',
+      grid_import_energy: 'sensor.growatt_today_energy_import',
       grid_export_energy: '',
-      today_batt_chg: 'sensor.goodwe_today_battery_charge',
-      today_load: 'sensor.goodwe_today_load',
-      battery_current: 'sensor.jk_current',
-      battery_voltage: 'sensor.jk_voltage',
-      battery_temp2: 'sensor.jk_temp2',
-      battery_mos: 'sensor.jk_mos',
-      goodwe_battery_soc: 'sensor.goodwe_battery_state_of_charge',
-      goodwe_battery_curr: 'sensor.goodwe_battery_current',
-      batt_dis: 'sensor.goodwe_today_battery_discharge',
+      today_batt_chg: 'sensor.growatt_today_battery_charge',
+      today_load: 'sensor.growatt_today_load',
+      battery_current: 'sensor.growatt_current',
+      battery_voltage: 'sensor.growatt_voltage',
+      battery_temp2: 'sensor.growatt_temp2',
+      battery_mos: 'sensor.growatt_mos',
+      fallback_battery_soc: 'sensor.growatt_battery_state_of_charge',
+      fallback_battery_curr: 'sensor.fallback_battery_current',
+      batt_dis: 'sensor.growatt_today_battery_discharge',
       battery2_soc: '',
       battery2_power: '',
       battery2_current: '',
@@ -969,10 +969,10 @@ class NexaFlowCard extends HTMLElement {
     const todayPv = this._val(this.config.today_pv) || 0;
     const todayBattChg = this._val(this.config.today_batt_chg) || 0;
     const todayLoad = this._val(this.config.today_load) || 0;
-    const battSoc1 = this._val(this.config.battery_soc) || this._val(this.config.goodwe_battery_soc) || 0;
+    const battSoc1 = this._val(this.config.battery_soc) || this._val(this.config.fallback_battery_soc) || 0;
     let battPwr1 = this._val(this.config.battery_power) || 0;
     if (this.config.invert_battery_power) battPwr1 = -battPwr1;
-    let battCurr1 = this._val(this.config.battery_current) || this._val(this.config.goodwe_battery_curr) || 0;
+    let battCurr1 = this._val(this.config.battery_current) || this._val(this.config.fallback_battery_curr) || 0;
     if (this.config.invert_battery_power) battCurr1 = -battCurr1;
     const battVolt1 = this._val(this.config.battery_voltage) || 0;
     const temp1_1 = this._val(this.config.battery_temp1) || 0;
@@ -1151,7 +1151,7 @@ class NexaFlowCard extends HTMLElement {
     // Total PV Generation stat tile
     const _totalPvGenEl = getEl('bTotalPvGen');
     if (_totalPvGenEl) {
-      const totalPvGenEntity = this.config.total_pv_gen_entity || 'sensor.goodwe_total_pv_generation';
+      const totalPvGenEntity = this.config.total_pv_gen_entity || 'sensor.growatt_total_pv_generation';
       const totalPvGenState = this._hass && this._hass.states[totalPvGenEntity];
       if (totalPvGenState) {
         const val = parseFloat(totalPvGenState.state);
@@ -1329,7 +1329,7 @@ class NexaFlowCard extends HTMLElement {
 window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'nexa-flow-card',
-  name: 'K-Flow Card',
+  name: 'Nexa Flow Card',
   description: 'Solar Energy Flow Card',
   preview: true,
   version: '7.4.0',

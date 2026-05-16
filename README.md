@@ -10,7 +10,7 @@
 
 ## Overview
 
-`nexa-flow-card` is a fully custom Home Assistant Lovelace card that renders a live, animated energy-flow diagram for a GoodWe solar inverter system with JK BMS battery storage. It is self-contained in a single JavaScript file â€” no dependencies, no HACS card required beyond loading the resource.
+`nexa-flow-card` is a fully custom Home Assistant Lovelace card that renders a live, animated energy-flow diagram for a Growatt Nexa solar inverter system. It is self-contained in a single JavaScript file â€” no dependencies, no HACS card required beyond loading the resource.
 
 The card combines an SVG energy-flow canvas (sun arc, animated flow paths, inverter, battery, grid, home, EV nodes) with an HTML stat panel showing real-time battery telemetry. Everything updates live via the standard `hass` setter.
 
@@ -83,49 +83,49 @@ All keys are configured through the visual editor. The YAML equivalents are list
 | Key | Default | Description |
 |---|---|---|
 | `inverter_name` | `''` | Label shown in the inverter node |
-| `pv1_power` | `sensor.goodwe_pv1_power` | PV string 1 power (W) |
-| `pv2_power` | `sensor.goodwe_pv2_power` | PV string 2 power (W) |
+| `pv1_power` | `sensor.Growatt Nexa_pv1_power` | PV string 1 power (W) |
+| `pv2_power` | `sensor.Growatt Nexa_pv2_power` | PV string 2 power (W) |
 | `pv3_power` | `''` | PV string 3 â€” optional, enable via Extra PV toggle |
 | `pv4_power` | `''` | PV string 4 â€” optional, enable via Extra PV toggle |
-| `pv_total_power` | `sensor.goodwe_pv_power` | Total PV power (W) |
+| `pv_total_power` | `sensor.Growatt Nexa_pv_power` | Total PV power (W) |
 | `pv_max_power` | `7500` | Max PV power for bar scaling (W) |
-| `today_pv` | `sensor.goodwe_today_s_pv_generation` | Today's PV generation (kWh) |
-| `total_pv_gen_entity` | `sensor.goodwe_total_pv_generation` | Lifetime PV generation (kWh) |
-| `inv_temp` | `sensor.goodwe_inverter_temperature_module` | Inverter temperature |
-| `today_batt_chg` | `sensor.goodwe_today_battery_charge` | Today battery charge (kWh) |
-| `today_load` | `sensor.goodwe_today_load` | Today load (kWh) |
+| `today_pv` | `sensor.Growatt Nexa_today_s_pv_generation` | Today's PV generation (kWh) |
+| `total_pv_gen_entity` | `sensor.Growatt Nexa_total_pv_generation` | Lifetime PV generation (kWh) |
+| `inv_temp` | `sensor.Growatt Nexa_inverter_temperature_module` | Inverter temperature |
+| `today_batt_chg` | `sensor.Growatt Nexa_today_battery_charge` | Today battery charge (kWh) |
+| `today_load` | `sensor.Growatt Nexa_today_load` | Today load (kWh) |
 | `sun` | `sun.sun` | Sun entity for arc position |
 
 ### Grid
 
 | Key | Default | Description |
 |---|---|---|
-| `grid_active_power` | `sensor.goodwe_active_power` | Grid active power (W) |
-| `grid_import_energy` | `sensor.goodwe_today_energy_import` | Today grid import (kWh) |
+| `grid_active_power` | `sensor.Growatt Nexa_active_power` | Grid active power (W) |
+| `grid_import_energy` | `sensor.Growatt Nexa_today_energy_import` | Today grid import (kWh) |
 | `grid_export_energy` | `''` | Today grid export (kWh) â€” optional |
 | `grid_power_alt` | `sensor.grid_phase_a_power` | Alternate grid power sensor |
 | `invert_grid_power` | `false` | Invert sign â€” enable if positive = exporting |
-| `consump` | `sensor.goodwe_house_consumption` | House consumption (W) |
+| `consump` | `sensor.Growatt Nexa_house_consumption` | House consumption (W) |
 
 ### Primary Battery
 
 | Key | Default | Description |
 |---|---|---|
 | `_show_battery` | `true` | Show primary battery section |
-| `battery_soc` | `sensor.jk_soc` | Battery state of charge (%) |
-| `battery_power` | `sensor.jk_power` | Battery power (W) |
-| `battery_current` | `sensor.jk_current` | Battery current (A) |
-| `battery_voltage` | `sensor.jk_voltage` | Battery voltage (V) |
-| `battery_temp1` | `sensor.jk_temp1` | Cell temp probe 1 |
-| `battery_temp2` | `sensor.jk_temp2` | Cell temp probe 2 |
-| `battery_mos` | `sensor.jk_mos` | BMS MOS temperature |
-| `battery_min_cell` | `sensor.jk_cellmin` | Min cell voltage |
-| `battery_max_cell` | `sensor.jk_cellmax` | Max cell voltage |
-| `batt_dis` | `sensor.goodwe_today_battery_discharge` | Today discharge (kWh) |
+| `battery_soc` | `sensor.growatt_soc` | Battery state of charge (%) |
+| `battery_power` | `sensor.growatt_power` | Battery power (W) |
+| `battery_current` | `sensor.growatt_current` | Battery current (A) |
+| `battery_voltage` | `sensor.growatt_voltage` | Battery voltage (V) |
+| `battery_temp1` | `sensor.growatt_temp1` | Cell temp probe 1 |
+| `battery_temp2` | `sensor.growatt_temp2` | Cell temp probe 2 |
+| `battery_mos` | `sensor.growatt_mos` | BMS MOS temperature |
+| `battery_min_cell` | `sensor.growatt_cellmin` | Min cell voltage |
+| `battery_max_cell` | `sensor.growatt_cellmax` | Max cell voltage |
+| `batt_dis` | `sensor.Growatt Nexa_today_battery_discharge` | Today discharge (kWh) |
 | `battery_full_ah` | `314` | Battery capacity (Ah) |
 | `battery_full_wh` | `16076` | Battery capacity (Wh) |
-| `goodwe_battery_soc` | `sensor.goodwe_battery_state_of_charge` | Fallback SOC |
-| `goodwe_battery_curr` | `sensor.goodwe_battery_current` | Fallback current |
+| `Growatt Nexa_battery_soc` | `sensor.Growatt Nexa_battery_state_of_charge` | Fallback SOC |
+| `Growatt Nexa_battery_curr` | `sensor.Growatt Nexa_battery_current` | Fallback current |
 | `invert_battery_power` | `false` | Invert sign â€” enable if positive = discharging |
 
 ### Secondary Battery
@@ -260,7 +260,7 @@ All keys are configured through the visual editor. The YAML equivalents are list
 - Static SVG rebuilt via `_buildStaticSVG()` on `setConfig`; dynamic updates isolated to `_updateDynamic()`.
 
 ### v4.x and earlier
-- Initial card structure: basic SVG energy flow with GoodWe + JK BMS entity mapping.
+- Initial card structure: basic SVG energy flow with Growatt Nexa + JK BMS entity mapping.
 - Visual editor scaffolded with `makeSection`, `picker`, `textField`, `switchRow` helpers.
 - `ha-selector` entity pickers introduced.
 - SOC colour logic, cell temp/voltage colour helpers defined.
@@ -301,7 +301,7 @@ nexa-flow-card.js
 
 ## Notes
 
-- Tested on Home Assistant OS (HAOS) with GoodWe ET/ES inverter integration and JK BMS Bluetooth integration.
+- Tested on Home Assistant OS (HAOS) with Growatt Nexa inverter integration and JK BMS Bluetooth integration.
 - The card uses shadow DOM â€” custom CSS from themes does not penetrate the card. All colours are hardcoded or driven by entity values.
 - Config keys prefixed with `_` (e.g. `_show_battery`) are editor-only boolean toggles â€” they control visibility but are stored in the card config YAML.
 - When installed via HACS, the resource is registered automatically. When installed manually, register as `type: module`.
@@ -331,7 +331,7 @@ nexa-flow-card.js
 
 - Open **Developer Tools â†’ States** and confirm the entity ID exists and has a valid numeric state (not `unavailable` or `unknown`).
 - Entity IDs are case-sensitive. Check for typos in the editor.
-- If using GoodWe integration, ensure the inverter is online and the integration is polling correctly.
+- If using Growatt Nexa integration, ensure the inverter is online and the integration is polling correctly.
 - The card skips `unavailable` and `unknown` states by design â€” the tile will show `--` until the entity returns a valid value.
 
 ---
@@ -386,3 +386,4 @@ When reporting an issue, include:
 ---
 
 *Khan Automation Â· nexa-flow-card Â· Last updated: v7.4.0*
+
