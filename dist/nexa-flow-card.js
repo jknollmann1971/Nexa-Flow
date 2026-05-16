@@ -1,15 +1,15 @@
-// k-flow-card.js – Unified Edition v7.4.0
+﻿// nexa-flow-card.js â€“ Unified Edition v7.4.0
 // Changes v7.4.0:
-//   - Labels section: switchRow replaced by header chip (+ Enable / ✓ Enabled style).
-//   - Per-row auto-enable: each entity picker unlocks only when its label text ≠ default.
+//   - Labels section: switchRow replaced by header chip (+ Enable / âœ“ Enabled style).
+//   - Per-row auto-enable: each entity picker unlocks only when its label text â‰  default.
 //   - Corresponding Battery/Solar pickers lock per-row (not globally).
 //   - _updateDynamic: clean _rowActive + _readNum/_readStr helpers (replaces old monolithic labelsOn check).
 //   - _set: re-renders on any of the 6 label text key changes.
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // VISUAL EDITOR
-// ═══════════════════════════════════════════════════════════════
-class KFlowCardEditor extends HTMLElement {
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+class NexaFlowCardEditor extends HTMLElement {
   constructor() {
     super();
     this._config = {};
@@ -152,9 +152,9 @@ class KFlowCardEditor extends HTMLElement {
       sec.className = 'section';
       const hdr = document.createElement('div');
       hdr.className = 'section-header toggleable';
-      // Chevron — styled as a small disclosure button
+      // Chevron â€” styled as a small disclosure button
       const chevron = document.createElement('span');
-      chevron.textContent = isOpen ? '▼' : '▶';
+      chevron.textContent = isOpen ? 'â–¼' : 'â–¶';
       chevron.style.cssText = [
         'display:inline-flex',
         'align-items:center',
@@ -185,7 +185,7 @@ class KFlowCardEditor extends HTMLElement {
       if (opts.toggleKey) {
         const chip = document.createElement('span');
         chip.className = 'toggle-chip' + (opts.toggleOn ? ' on' : '');
-        chip.innerHTML = opts.toggleOn ? `✓ Enabled` : `＋ Enable`;
+        chip.innerHTML = opts.toggleOn ? `âœ“ Enabled` : `ï¼‹ Enable`;
         chip.addEventListener('click', (e) => {
           e.stopPropagation();
           this._set(opts.toggleKey, !opts.toggleOn);
@@ -233,8 +233,8 @@ class KFlowCardEditor extends HTMLElement {
       return wrap;
     };
 
-    // Text field — native input, commits on blur/Enter only.
-    // ha-selector(text) fires value-changed per keystroke → triggers setConfig → _render → destroys field.
+    // Text field â€” native input, commits on blur/Enter only.
+    // ha-selector(text) fires value-changed per keystroke â†’ triggers setConfig â†’ _render â†’ destroys field.
     const textField = (key, label, placeholder = '') => {
       const wrap = document.createElement('div');
       wrap.className = 'row';
@@ -263,7 +263,7 @@ class KFlowCardEditor extends HTMLElement {
         background:transparent; color:var(--primary-text-color);
         font-size:.95rem; font-family:inherit; padding:0; box-sizing:border-box;
       `;
-      // Commit ONLY on blur or Enter — prevents per-keystroke re-render
+      // Commit ONLY on blur or Enter â€” prevents per-keystroke re-render
       const commit = (ev) => this._set(key, ev.target.value);
       input.addEventListener('change', commit);
       input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') ev.target.blur(); });
@@ -273,7 +273,7 @@ class KFlowCardEditor extends HTMLElement {
       return wrap;
     };
 
-    // Number field — native input, commits on blur/Enter only (same reason as textField).
+    // Number field â€” native input, commits on blur/Enter only (same reason as textField).
     const numberField = (key, label, min, max, step, unit = '') => {
       const wrap = document.createElement('div');
       wrap.className = 'row';
@@ -302,7 +302,7 @@ class KFlowCardEditor extends HTMLElement {
         background:transparent; color:var(--primary-text-color);
         font-size:.95rem; font-family:inherit; padding:0; box-sizing:border-box;
       `;
-      // Commit ONLY on blur or Enter — prevents per-keystroke re-render
+      // Commit ONLY on blur or Enter â€” prevents per-keystroke re-render
       const commit = (ev) => { const v = parseFloat(ev.target.value); if (!isNaN(v)) this._set(key, v); };
       input.addEventListener('change', commit);
       input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') ev.target.blur(); });
@@ -361,12 +361,14 @@ class KFlowCardEditor extends HTMLElement {
       return d;
     };
 
-    // ═══ Build sections ═══
-    shell.appendChild(makeSection('general', '⚙️', 'General', [
-      textField('inverter_name', 'Inverter Name', 'e.g. My Inverter'),
+    // â•â•â• Build sections â•â•â•
+    shell.appendChild(makeSection('general', 'âš™ï¸', 'General', [
+      textField('inverter_name', 'Inverter Name', 'z.B. Nexa 2000'),
+      picker('nexa_work_mode', 'Work Mode Sensor', true),
+      picker('nexa_island_mode', 'Island Mode Schalter', true),
     ]));
 
-    // ── Labels: global gate + per-row activation ──
+    // â”€â”€ Labels: global gate + per-row activation â”€â”€
     // Gate: section chip toggles _labels_custom_entities (body hidden when off).
     // Per-row: entity picker activates only when that row's label text differs from its default.
     const labelsEnabled = !!(cfg._labels_custom_entities);
@@ -390,14 +392,14 @@ class KFlowCardEditor extends HTMLElement {
           'color:var(--secondary-text-color)', 'letter-spacing:.3px',
           'pointer-events:none', 'z-index:11',
         ].join(';');
-        note.textContent = '⛔ Overridden by Labels section';
+        note.textContent = 'â›” Overridden by Labels section';
         wrap.appendChild(veil);
         wrap.appendChild(note);
       }
       return wrap;
     };
 
-    // Per-row active: true when global gate is ON and label text ≠ default
+    // Per-row active: true when global gate is ON and label text â‰  default
     const _labelChanged = (key, def) => labelsEnabled && (cfg[key] || def) !== def;
     const cellTempActive   = _labelChanged('label_cell_temp_minmax', 'CELL TEMP MIN/MAX');
     const bmsTempActive    = _labelChanged('label_bms_temp',         'BMS TEMP');
@@ -406,7 +408,7 @@ class KFlowCardEditor extends HTMLElement {
     const battDisActive    = _labelChanged('label_batt_dis',         'Batt Dis.');
     const totalPvGenActive = _labelChanged('label_total_pv_gen',     'TOTAL PV GEN.');
 
-    // Label rows — text field + entity picker; picker active only when row is active
+    // Label rows â€” text field + entity picker; picker active only when row is active
     const labelRow = (textKey, textLabel, textPlaceholder, entityKey, active = false) => {
       const frag = document.createDocumentFragment();
       frag.appendChild(textField(textKey, textLabel, textPlaceholder));
@@ -414,7 +416,7 @@ class KFlowCardEditor extends HTMLElement {
       entityRow.style.cssText = 'margin-top:-6px;margin-bottom:14px;';
       const entityLabel = document.createElement('div');
       entityLabel.style.cssText = 'font-size:.72rem;color:var(--secondary-text-color);padding:0 2px 3px;line-height:1;';
-      entityLabel.textContent = active ? 'Entity (overrides default)' : 'Entity — change label to unlock';
+      entityLabel.textContent = active ? 'Entity (overrides default)' : 'Entity â€” change label to unlock';
       const sel = document.createElement('ha-selector');
       sel.hass = this._hass;
       sel.selector = { entity: {} };
@@ -446,7 +448,7 @@ class KFlowCardEditor extends HTMLElement {
       return info;
     })();
 
-    shell.appendChild(makeSection('labels', '🏷️', 'Labels', [
+    shell.appendChild(makeSection('labels', 'ðŸ·ï¸', 'Labels', [
       labelInfoBanner,
       labelRow('label_cell_temp_minmax', 'Cell Temp Min/Max label', 'CELL TEMP MIN/MAX', 'label_entity_cell_temp', cellTempActive),
       labelRow('label_bms_temp',         'BMS Temp label',          'BMS TEMP',          'label_entity_bms_temp',  bmsTempActive),
@@ -456,17 +458,17 @@ class KFlowCardEditor extends HTMLElement {
       labelRow('label_total_pv_gen',     'Total PV Gen label',      'TOTAL PV GEN.',     'total_pv_gen_entity',    totalPvGenActive),
     ], { toggleKey: '_labels_custom_entities', toggleOn: labelsEnabled, hidden: !labelsEnabled }));
 
-    shell.appendChild(makeSection('solar', '☀️', 'Solar', [
+    shell.appendChild(makeSection('solar', 'â˜€ï¸', 'Solar', [
       picker('pv1_power', 'PV1 Power'),
       picker('pv2_power', 'PV2 Power'),
     ]));
 
-    shell.appendChild(makeSection('solar_extra', '☀️', 'Extra PV Strings', [
+    shell.appendChild(makeSection('solar_extra', 'â˜€ï¸', 'Extra PV Strings', [
       picker('pv3_power', 'PV3 Power', true),
       picker('pv4_power', 'PV4 Power', true),
     ], { toggleKey: '_show_pv_extra', toggleOn: showPVExtra, hidden: !showPVExtra }));
 
-    shell.appendChild(makeSection('solar_extras', '☀️', 'Solar Extras', [
+    shell.appendChild(makeSection('solar_extras', 'â˜€ï¸', 'Solar Extras', [
       picker('pv_total_power',  'Total PV Power',  true),
       divider(),
       picker('inv_temp',        'Inverter Temp'),
@@ -479,8 +481,8 @@ class KFlowCardEditor extends HTMLElement {
       pickerMaybeDisabled('total_pv_gen_entity', 'Total PV Generation', totalPvGenActive),
     ]));
 
-    shell.appendChild(makeSection('grid', '🔌', 'Grid', [
-      switchRow('invert_grid_power', '🔄 Invert grid power sign', 'Enable if positive = exporting (e.g. GoodWe active_power)'),
+    shell.appendChild(makeSection('grid', 'ðŸ”Œ', 'Grid', [
+      switchRow('invert_grid_power', 'ðŸ”„ Invert grid power sign', 'Enable if positive = exporting (e.g. GoodWe active_power)'),
       divider(),
       picker('grid_active_power',  'Grid Active Power'),
       picker('grid_import_energy', 'Grid Import Energy'),
@@ -488,13 +490,15 @@ class KFlowCardEditor extends HTMLElement {
       picker('grid_power_alt',     'Alt Grid Sensor',    true),
     ]));
 
-    shell.appendChild(makeSection('battery1', '🔋', 'Primary Battery', [
-      switchRow('invert_battery_power', '🔄 Invert battery power sign', 'Enable if positive = discharging'),
+    shell.appendChild(makeSection('battery1', 'ðŸ”‹', 'Primary Battery', [
+      switchRow('invert_battery_power', 'ðŸ”„ Invert battery power sign', 'Enable if positive = discharging'),
       divider(),
       picker('battery_soc',      'Battery SOC'),
       picker('battery_power',    'Battery Power'),
       picker('battery_current',  'Battery Current'),
       picker('battery_voltage',  'Battery Voltage'),
+      picker('nexa_batt_health', 'Battery Health (%)', true),
+      picker('nexa_batt_cycles', 'Battery Cycles', true),
       pickerMaybeDisabled('battery_temp1',    'Temp 1',             cellTempActive),
       pickerMaybeDisabled('battery_temp2',    'Temp 2',             cellTempActive),
       pickerMaybeDisabled('battery_mos',      'BMS Temp',           bmsTempActive),
@@ -506,8 +510,8 @@ class KFlowCardEditor extends HTMLElement {
       picker('goodwe_battery_curr', 'Fallback Current', true),
     ], { toggleKey: '_show_battery', toggleOn: showBatt1, hidden: !showBatt1 }));
 
-    shell.appendChild(makeSection('battery2', '🔋', 'Secondary Battery', [
-      switchRow('invert_battery_power', '🔄 Invert battery power sign', 'Shared with Primary'),
+    shell.appendChild(makeSection('battery2', 'ðŸ”‹', 'Secondary Battery', [
+      switchRow('invert_battery_power', 'ðŸ”„ Invert battery power sign', 'Shared with Primary'),
       divider(),
       picker('battery2_soc',      'SOC'),
       picker('battery2_power',    'Power'),
@@ -516,14 +520,14 @@ class KFlowCardEditor extends HTMLElement {
       pickerMaybeDisabled('battery2_mos',     'BMS Temp', bmsTempActive),
     ], { toggleKey: '_show_battery2', toggleOn: showBatt2, hidden: !showBatt2 }));
 
-    shell.appendChild(makeSection('limits', '⚙️', 'System Limits', [
+    shell.appendChild(makeSection('limits', 'âš™ï¸', 'System Limits', [
       numberField('battery_full_ah',    'Battery Capacity',  0, 2000,  1,   'Ah'),
       numberField('battery_full_wh',    'Battery Capacity',  0, 50000, 1,   'Wh'),
       numberField('inverter_max_power', 'Inverter Max Power',1000,20000,100, 'W'),
       numberField('pv_max_power',       'PV Max Power',      1000,30000,100, 'W'),
     ], { toggleKey: '_show_limits', toggleOn: showLimits, hidden: !showLimits }));
 
-    shell.appendChild(makeSection('ev', '🚗', 'EV / Car Charger', [
+    shell.appendChild(makeSection('ev', 'ðŸš—', 'EV / Car Charger', [
       picker('charger_state',           'Charger State'),
       picker('charger_power',           'Charger Power'),
       picker('charger_current',         'Charger Current'),
@@ -537,12 +541,12 @@ class KFlowCardEditor extends HTMLElement {
     this._rendered = true;
   }
 }
-customElements.define('k-flow-card-editor', KFlowCardEditor);
+customElements.define('nexa-flow-card-editor', NexaFlowCardEditor);
 
-// ═══════════════════════════════════════════════════════════════
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // MAIN CARD
-// ═══════════════════════════════════════════════════════════════
-class KFlowCard extends HTMLElement {
+// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+class NexaFlowCard extends HTMLElement {
   constructor() {
     super();
     this._hass = null;
@@ -554,40 +558,50 @@ class KFlowCard extends HTMLElement {
 
   static getStubConfig() {
     return {
+      // --- Growatt Nexa Standardwerte ---
+      pv_total_power: 'sensor.growatt_0hvrb0zr23jt00yy_pv_total_power',
+      today_pv: 'sensor.growatt_0hvrb0zr23jt00yy_pv_energy_today',
+      grid_active_power: 'sensor.growatt_0hvrb0zr23jt00yy_power_grid',
+      consump: 'sensor.growatt_0hvrb0zr23jt00yy_total_household_load',
+      battery_soc: 'sensor.growatt_0hvrb0zr23jt00yy_total_battery_soc',
+      battery_power: 'sensor.growatt_0hvrb0zr23jt00yy_charging_power',
+      inv_temp: 'sensor.growatt_0hvrb0zr23jt00yy_system_temperature',
+      battery_temp1: 'sensor.growatt_0hvrb0zr23jt00yy_battery_1_temperature',
+      battery_min_cell: 'sensor.growatt_0hvrb0zr23jt00yy_battery_1_min_cell_voltage',
+      battery_max_cell: 'sensor.growatt_0hvrb0zr23jt00yy_battery_1_max_cell_voltage',
+      total_pv_gen_entity: 'sensor.growatt_0hvrb0zr23jt00yy_pv_energy_total',
+      
+      // --- NEUE Nexa Sensoren ---
+      nexa_work_mode: 'sensor.growatt_0hvrb0zr23jt00yy_work_mode',
+      nexa_island_mode: 'switch.growatt_0hvrb0zr23jt00yy_island_mode_enabled',
+      nexa_batt_health: 'sensor.growatt_0hvrb0zr23jt00yy_battery_health',
+      nexa_batt_cycles: 'sensor.growatt_0hvrb0zr23jt00yy_battery_cycle_count',
+      
+      // Restliche Standards...
       pv1_power: 'sensor.goodwe_pv1_power',
       pv2_power: 'sensor.goodwe_pv2_power',
       pv3_power: '',
       pv4_power: '',
-      pv_total_power: 'sensor.goodwe_pv_power',
-      grid_active_power: 'sensor.goodwe_active_power',
       grid_import_energy: 'sensor.goodwe_today_energy_import',
       grid_export_energy: '',
-      consump: 'sensor.goodwe_house_consumption',
-      today_pv: 'sensor.goodwe_today_s_pv_generation',
       today_batt_chg: 'sensor.goodwe_today_battery_charge',
       today_load: 'sensor.goodwe_today_load',
-      battery_soc: 'sensor.jk_soc',
-      battery_power: 'sensor.jk_power',
       battery_current: 'sensor.jk_current',
       battery_voltage: 'sensor.jk_voltage',
-      battery_temp1: 'sensor.jk_temp1',
       battery_temp2: 'sensor.jk_temp2',
       battery_mos: 'sensor.jk_mos',
-      battery_min_cell: 'sensor.jk_cellmin',
-      battery_max_cell: 'sensor.jk_cellmax',
       goodwe_battery_soc: 'sensor.goodwe_battery_state_of_charge',
       goodwe_battery_curr: 'sensor.goodwe_battery_current',
-      inv_temp: 'sensor.goodwe_inverter_temperature_module',
       batt_dis: 'sensor.goodwe_today_battery_discharge',
       battery2_soc: '',
       battery2_power: '',
       battery2_current: '',
       battery2_voltage: '',
       battery2_mos: '',
-      battery_full_ah: 314,
-      battery_full_wh: 16076,
-      inverter_max_power: 6000,
-      pv_max_power: 7500,
+      battery_full_ah: 17.4,
+      battery_full_wh: 4000,
+      inverter_max_power: 2600,
+      pv_max_power: 2600,
       charger_state: '',
       charger_current: '',
       charger_power: '',
@@ -595,14 +609,13 @@ class KFlowCard extends HTMLElement {
       charger_eta: '',
       charger_battery_capacity_wh: '',
       sun: 'sun.sun',
-      inverter_name: '',
+      inverter_name: 'Nexa 2000',
       label_cell_temp_minmax: 'CELL TEMP MIN/MAX',
       label_bms_temp: 'BMS TEMP',
       label_endurance: 'ENDURANCE',
       label_min_cell: 'Min Cell',
       label_max_cell: 'Max Cell',
       label_batt_dis: 'Batt Dis.',
-      total_pv_gen_entity: 'sensor.goodwe_total_pv_generation',
       label_total_pv_gen: 'TOTAL PV GEN.',
       label_entity_cell_temp: '',
       label_entity_bms_temp: '',
@@ -614,7 +627,7 @@ class KFlowCard extends HTMLElement {
       _show_battery: true,
       _show_battery2: false,
       invert_battery_power: false,
-      invert_grid_power: false,
+      invert_grid_power: true,
       _show_pv_extra: false,   // combined toggle
       _show_ev: false,
       _show_limits: false,
@@ -622,10 +635,10 @@ class KFlowCard extends HTMLElement {
   }
 
   getCardSize() { return 8; }
-  static getConfigElement() { return document.createElement('k-flow-card-editor'); }
+  static getConfigElement() { return document.createElement('nexa-flow-card-editor'); }
 
   setConfig(config) {
-    this.config = { ...KFlowCard.getStubConfig(), ...config };
+    this.config = { ...NexaFlowCard.getStubConfig(), ...config };
     this._buildStaticSVG();
   }
 
@@ -714,7 +727,7 @@ class KFlowCard extends HTMLElement {
     const showBatt1 = !!(this.config._show_battery !== false);
     const ev   = !!(this.config._show_ev);
     const showPvExtra = !!(this.config._show_pv_extra);
-    const iconPath = '/local/community/k-flow-card';    // icons served from HACS community folder
+    const iconPath = '/local/community/nexa-flow-card';    // icons served from HACS community folder
 
     const pv3txt = showPvExtra ? `<text id="pv3label" x="8" y="424" font-size="9" fill="#8b949e" letter-spacing="1">PV3</text><text id="pv3FlowVal" x="8" y="438" font-size="12" font-weight="700" fill="#ffe83c">-- W</text>` : '';
     const pv4txt = showPvExtra ? `<text id="pv4label" x="8" y="456" font-size="9" fill="#8b949e" letter-spacing="1">PV4</text><text id="pv4FlowVal" x="8" y="470" font-size="12" font-weight="700" fill="#ffe83c">-- W</text>` : '';
@@ -747,7 +760,7 @@ class KFlowCard extends HTMLElement {
 
     const batteryTip = `<rect x="75" y="126" width="18" height="4" rx="2" fill="url(#battCapGrad)"/>`;
 
-    // Battery visibility helpers – mirror EV charger pattern
+    // Battery visibility helpers â€“ mirror EV charger pattern
     const battGhostPath = showBatt1
       ? `<path d="M 59,175 H 132 V 205 H 205" fill="none" stroke="#1e3a5f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.18"/>`
       : '';
@@ -801,7 +814,7 @@ class KFlowCard extends HTMLElement {
       .pvi .val.yw{color:#f4d03f} text{font-family:'Segoe UI',Arial,sans-serif}
     </style>
     <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;padding:13px;box-shadow:0 4px 20px rgba(0,0,0,.4);width:100%;box-sizing:border-box;">
-      <div class="ct">⚡ Energy Flow <span id="battStatusBadge" style="margin-left:auto;font-size:.5rem;font-weight:700;letter-spacing:1.5px;padding:1px 8px;border-radius:8px;background:#21262d;color:#8b949e;text-transform:uppercase">IDLE</span></div>
+      <div class="ct">âš¡ Energy Flow <span id="battStatusBadge" style="margin-left:auto;font-size:.5rem;font-weight:700;letter-spacing:1.5px;padding:1px 8px;border-radius:8px;background:#21262d;color:#8b949e;text-transform:uppercase">IDLE</span></div>
       <div style="width:100%;max-width:520px;margin:0 auto"><svg id="flowSvg" viewBox="0 0 520 470" style="width:100%;display:block">
       <defs>
         <filter id="arcSunF" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="7"/></filter>
@@ -847,7 +860,7 @@ class KFlowCard extends HTMLElement {
         <circle id="moonDot" cx="260" cy="72" r="6" fill="rgba(220,235,255,.92)" stroke="rgba(240,248,255,.9)" stroke-width="1.2"/>
       </g>
       <rect id="arcPvLabelRect" x="162" y="22" width="96" height="26" rx="13" fill="rgba(255,200,50,.22)" stroke="rgba(255,210,60,.5)" stroke-width="1.2"/>
-      <text id="arcPvLabelText" x="210" y="39" text-anchor="middle" fill="rgba(255,235,110,.98)" font-size="13" font-weight="800">0 W ⚡</text>
+      <text id="arcPvLabelText" x="210" y="39" text-anchor="middle" fill="rgba(255,235,110,.98)" font-size="13" font-weight="800">0 W âš¡</text>
       <g id="pvFlowGroup"></g>
 
       ${battGhostPath}
@@ -873,7 +886,7 @@ class KFlowCard extends HTMLElement {
 
       <rect id="fcInvRect" x="205" y="155" width="110" height="110" rx="18" fill="#161b22" stroke="#f4a93b" stroke-width="4"/>
       <text id="invNameLabel" x="260" y="203" text-anchor="middle" font-size="14" font-weight="800" fill="#f4a93b" letter-spacing="1">INV</text>
-      <text id="invTempFlow" x="260" y="222" text-anchor="middle" font-size="12" font-weight="700" fill="#58a6ff">-- °C</text>
+      <text id="invTempFlow" x="260" y="222" text-anchor="middle" font-size="12" font-weight="700" fill="#58a6ff">-- Â°C</text>
       <text id="invLoadPctFlow" x="260" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#3ce878">--%</text>
 
       <text id="pv1label" x="8" y="360" font-size="9" fill="#8b949e" letter-spacing="1">PV1</text>
@@ -894,8 +907,8 @@ class KFlowCard extends HTMLElement {
       </div>
       <div class="dv"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:5px">
-        <div class="st"><div class="l">${this.config.label_cell_temp_minmax || 'CELL TEMP MIN/MAX'}</div><div class="v" id="bTemp1">-- °C</div></div>
-        <div class="st"><div class="l">${this.config.label_bms_temp || 'BMS TEMP'}</div><div class="v" id="bTemp2">-- °C</div></div>
+        <div class="st"><div class="l">${this.config.label_cell_temp_minmax || 'CELL TEMP MIN/MAX'}</div><div class="v" id="bTemp1">-- Â°C</div></div>
+        <div class="st"><div class="l">${this.config.label_bms_temp || 'BMS TEMP'}</div><div class="v" id="bTemp2">-- Â°C</div></div>
         <div class="st"><div class="l">${this.config.label_total_pv_gen || 'TOTAL PV GEN.'}</div><div class="v" id="bTotalPvGen">-- kWh</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:4px">
@@ -913,12 +926,12 @@ class KFlowCard extends HTMLElement {
         </div>
       </div>
       <div class="dv"></div>
-      <div class="ct">☀️ Inverter</div>
+      <div class="ct">â˜€ï¸ Inverter</div>
       <div class="pvf">
-        <div class="pvi"><div class="ico">☀️</div><div class="lbl">Today PV</div><div class="val yw" id="invTodayPv">-- kWh</div></div>
-        <div class="pvi"><div class="ico">🔋</div><div class="lbl">Chg / Dis</div><div class="val" id="invTodayBattChg">-- kWh</div><div class="val" id="invTodayBattDis" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
-        <div class="pvi"><div class="ico">⚡</div><div class="lbl">Remaining</div><div class="val" id="invRemCap">-- Ah</div><div class="val" id="invRemKwh" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
-        <div class="pvi"><div class="ico">🏡</div><div class="lbl">Today Load</div><div class="val" id="invTodayLoad">-- kWh</div></div>
+        <div class="pvi"><div class="ico">â˜€ï¸</div><div class="lbl">Today PV</div><div class="val yw" id="invTodayPv">-- kWh</div></div>
+        <div class="pvi"><div class="ico">ðŸ”‹</div><div class="lbl">Chg / Dis</div><div class="val" id="invTodayBattChg">-- kWh</div><div class="val" id="invTodayBattDis" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
+        <div class="pvi"><div class="ico">âš¡</div><div class="lbl">Remaining</div><div class="val" id="invRemCap">-- Ah</div><div class="val" id="invRemKwh" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
+        <div class="pvi"><div class="ico">ðŸ¡</div><div class="lbl">Today Load</div><div class="val" id="invTodayLoad">-- kWh</div></div>
       </div>
     </div>`;
   }
@@ -930,6 +943,12 @@ class KFlowCard extends HTMLElement {
     const setText = (id, txt) => { const el = getEl(id); if (el) el.textContent = txt; };
     const setAttr = (id, attr, val) => { const el = getEl(id); if (el) el.setAttribute(attr, val); };
     const setDisplay = (id, visible) => { const el = getEl(id); if (!el) return; el.style.display = visible ? '' : 'none'; };
+
+    // Nexa spezifische Daten auslesen
+    const workModeStr = this._strVal(this.config.nexa_work_mode) || 'Normal';
+    const islandModeStr = this._strVal(this.config.nexa_island_mode) || 'off';
+    const battHealth = this._val(this.config.nexa_batt_health) || 100;
+    const battCycles = this._val(this.config.nexa_batt_cycles) || 0;
 
     const pv1 = this._val(this.config.pv1_power) || 0;
     const pv2 = this._val(this.config.pv2_power) || 0;
@@ -960,7 +979,7 @@ class KFlowCard extends HTMLElement {
     const battDis1 = this._val(this.config.batt_dis) || 0;
     const invTemp = this._val(this.config.inv_temp) || 0;
 
-    // System limits – direct numbers
+    // System limits â€“ direct numbers
     const fullAh = Number(this.config.battery_full_ah) || 314;
     const fullWh = Number(this.config.battery_full_wh) || 16076;
     const invMax = Number(this.config.inverter_max_power) || 6000;
@@ -994,7 +1013,7 @@ class KFlowCard extends HTMLElement {
       if (moonGroup) moonGroup.setAttribute('opacity', '1');
     } else { if (moonGroup) moonGroup.setAttribute('opacity', '0'); }
 
-    const pvTxt = (pvTotal >= 1000 ? (pvTotal / 1000).toFixed(2) + ' kW' : pvTotal.toFixed(0) + ' W') + ' ⚡';
+    const pvTxt = (pvTotal >= 1000 ? (pvTotal / 1000).toFixed(2) + ' kW' : pvTotal.toFixed(0) + ' W') + ' âš¡';
     const pvLabelRect = getEl('arcPvLabelRect');
     const pvLabelText = getEl('arcPvLabelText');
     if (pvLabelRect) { pvLabelRect.setAttribute('x', sun.t < 0.5 ? Math.max(4, sun.bx - 108) : Math.min(sun.bx + 14, 420)); pvLabelRect.setAttribute('y', Math.max(2, sun.by - 28)); }
@@ -1033,10 +1052,10 @@ class KFlowCard extends HTMLElement {
     setFlow('flowGridIn', gridActive > 10, gridActive, flowDur(gridActive), '#FF2929');
     setFlow('flowGridOut', gridActive < -10, Math.abs(gridActive), flowDur(Math.abs(gridActive)), '#2ecc71');
 
-    // flowInvLoad color — matches the dominant source feeding the home load
-    // PV    → #ffe83c  (yellow,  matches PV flow lines)
-    // Batt  → #f39c4b / #e67e22 / #f85149  (orange→red, matches battLineColor)
-    // Grid  → #FF2929  (red,     matches flowGridIn)
+    // flowInvLoad color â€” matches the dominant source feeding the home load
+    // PV    â†’ #ffe83c  (yellow,  matches PV flow lines)
+    // Batt  â†’ #f39c4b / #e67e22 / #f85149  (orangeâ†’red, matches battLineColor)
+    // Grid  â†’ #FF2929  (red,     matches flowGridIn)
     const absGrid = Math.abs(gridActive > 10 ? gridActive : 0);  // only count grid import
     const absBattOut = battPwr1 < -10 ? Math.abs(battPwr1) : 0;  // only count discharge
     const absPvLoad = pvTotal > 10 ? pvTotal : 0;
@@ -1044,7 +1063,7 @@ class KFlowCard extends HTMLElement {
     if (absGrid >= absPvLoad && absGrid >= absBattOut && absGrid > 10) {
       loadFlowColor = '#FF2929'; // grid dominant
     } else if (absBattOut >= absPvLoad && absBattOut >= absGrid && absBattOut > 10) {
-      // battery dominant — mirror battLineColor scale
+      // battery dominant â€” mirror battLineColor scale
       loadFlowColor = absBattOut < 1000 ? '#f39c4b' : absBattOut < 2500 ? '#e67e22' : '#f85149';
     } else {
       loadFlowColor = '#ffe83c'; // PV dominant
@@ -1077,8 +1096,8 @@ class KFlowCard extends HTMLElement {
       const bolt1 = getEl('battBoltGroup1'), bolt2 = getEl('battBoltGroup2');
       if (bolt1) bolt1.setAttribute('opacity', (battPwr1 > 10 && absPwr1 >= 10) ? '1' : '0');
       if (bolt2) bolt2.setAttribute('opacity', (battPwr2 > 10 && Math.abs(battPwr2) >= 10) ? '1' : '0');
-      setText('bTemp1', temp1_1.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' °C');
-      setText('bTemp2', mos1.toFixed(1) + ' / ' + mos2.toFixed(1) + ' °C');
+      setText('bTemp1', temp1_1.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' Â°C');
+      setText('bTemp2', mos1.toFixed(1) + ' / ' + mos2.toFixed(1) + ' Â°C');
       // bMinCell, bMaxCell, bBattDis handled by label override block below
     } else {
       const fill = this._battFill(battSoc1);
@@ -1089,12 +1108,12 @@ class KFlowCard extends HTMLElement {
       setText('battPwrFlow', absPwr1.toFixed(0) + ' W');
       setText('battCurrFlow', battCurr1.toFixed(1) + ' A');
       const bolt = getEl('battBoltGroup'); if (bolt) bolt.setAttribute('opacity', (battPwr1 > 10 && absPwr1 >= 10) ? '1' : '0');
-      setText('bTemp1', temp1_1.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' °C');
-      setText('bTemp2', mos1.toFixed(1) + ' °C');
+      setText('bTemp1', temp1_1.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' Â°C');
+      setText('bTemp2', mos1.toFixed(1) + ' Â°C');
       // bMinCell, bMaxCell, bBattDis handled by label override block below
     }
 
-    // Color and value for cell tiles — handled by label override block below
+    // Color and value for cell tiles â€” handled by label override block below
 
     // Endurance
     let endHours = null, endText = '--', endColor = '#8b949e', isETA = false;
@@ -1146,13 +1165,13 @@ class KFlowCard extends HTMLElement {
     const badge = getEl('battStatusBadge');
     if (badge) { badge.textContent = absPwr1 < 50 ? 'IDLE' : isCharging1 ? 'CHG' : 'DISCHG'; badge.style.color = absPwr1 < 50 ? '#8b949e' : isCharging1 ? '#00d7ff' : '#3ce878'; }
 
-    setText('invTempFlow', invTemp.toFixed(1) + ' °C');
+    setText('invTempFlow', invTemp.toFixed(1) + ' Â°C');
     setText('invNameLabel', this.config.inverter_name || 'INV');
     setAttr('invTempFlow', 'fill', invTemp <= 45 ? '#58a6ff' : invTemp <= 55 ? '#f39c4b' : '#f85149');
     const invLoadPct = Math.min(load / invMax * 100, 100).toFixed(0);
     setText('invLoadPctFlow', invLoadPct + '%'); setAttr('invLoadPctFlow', 'fill', invLoadPct <= 50 ? '#3fb950' : '#f39c4b');
 
-    const gridDir = gridActive > 10 ? '▼ ' : gridActive < -10 ? '▲ ' : '';
+    const gridDir = gridActive > 10 ? 'â–¼ ' : gridActive < -10 ? 'â–² ' : '';
     setText('fcGridVal', gridDir + Math.abs(gridActive).toFixed(0) + ' W');
     setAttr('fcGridVal', 'fill', gridActive > 10 ? '#FF2929' : gridActive < -10 ? '#2ecc71' : '#3a3a3a');
     setText('gridImportVal', gridImport.toFixed(2) + ' kWh');
@@ -1175,7 +1194,7 @@ class KFlowCard extends HTMLElement {
     setText('invTodayBattChg', todayBattChg + ' kWh');
     setText('invTodayBattDis', battDis1 + ' kWh');
     setText('invTodayLoad', todayLoad + ' kWh');
-    // ── Remaining Ah + kWh ──
+    // â”€â”€ Remaining Ah + kWh â”€â”€
     const totalRemAh = remCap1 + (dual ? (battSoc2 / 100) * fullAh : 0);
     const avgVolt = dual && battVolt2 > 0 ? (battVolt1 + battVolt2) / 2 : battVolt1;
     const totalRemKwh = avgVolt > 0 ? (totalRemAh * avgVolt / 1000) : null;
@@ -1188,8 +1207,8 @@ class KFlowCard extends HTMLElement {
       invRemKwhEl.style.color = remColor;
     }
 
-    // ── Label entity overrides for stat tiles ──
-    // Per-row: override active only when global gate ON AND label text ≠ its default
+    // â”€â”€ Label entity overrides for stat tiles â”€â”€
+    // Per-row: override active only when global gate ON AND label text â‰  its default
     const labelsOn = !!(this.config._labels_custom_entities);
     const _rowActive = (labelKey, def) => labelsOn && (this.config[labelKey] || def) !== def;
     const _readNum  = (entityKey, fallback) => {
@@ -1200,7 +1219,7 @@ class KFlowCard extends HTMLElement {
       const s = this._hass && this._hass.states[this.config[entityKey]];
       return s ? s.state : fallback;
     };
-    // Cell temp — single entity replaces entire temp1/temp2 display when active
+    // Cell temp â€” single entity replaces entire temp1/temp2 display when active
     const cellTempCustom = _rowActive('label_cell_temp_minmax', 'CELL TEMP MIN/MAX') && this.config.label_entity_cell_temp;
     const temp1Final  = cellTempCustom ? _readNum('label_entity_cell_temp', temp1_1) : temp1_1;
     // BMS temp
@@ -1219,19 +1238,19 @@ class KFlowCard extends HTMLElement {
     const _bT1o = getEl('bTemp1');
     if (_bT1o) {
       if (cellTempCustom) {
-        _bT1o.textContent = temp1Final.toFixed(1) + ' °C';
+        _bT1o.textContent = temp1Final.toFixed(1) + ' Â°C';
         _bT1o.style.color = this._cellTempColor(temp1Final);
       } else {
-        _bT1o.textContent = temp1Final.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' °C';
+        _bT1o.textContent = temp1Final.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' Â°C';
         _bT1o.style.color = this._cellTempColor(Math.max(temp1Final, temp2_1));
       }
     }
-    const _bT2o = getEl('bTemp2'); if (_bT2o) { _bT2o.textContent = mosFinal.toFixed(1) + (dual ? ' / ' + mos2.toFixed(1) : '') + ' °C'; _bT2o.style.color = this._cellTempColor(dual ? Math.max(mosFinal, mos2) : mosFinal); }
+    const _bT2o = getEl('bTemp2'); if (_bT2o) { _bT2o.textContent = mosFinal.toFixed(1) + (dual ? ' / ' + mos2.toFixed(1) : '') + ' Â°C'; _bT2o.style.color = this._cellTempColor(dual ? Math.max(mosFinal, mos2) : mosFinal); }
     const _bMno = getEl('bMinCell'); if (_bMno) { _bMno.textContent = minCellFinal.toFixed(3) + ' V'; _bMno.style.color = this._cellVoltColor(minCellFinal); }
     const _bMxo = getEl('bMaxCell'); if (_bMxo) { _bMxo.textContent = maxCellFinal.toFixed(3) + ' V'; _bMxo.style.color = this._cellVoltColor(maxCellFinal); }
     const _bDiso = getEl('bBattDis'); if (_bDiso) _bDiso.textContent = battDisFinal + ' kWh';
 
-    // ── HTML stat tile — endurance ──
+    // â”€â”€ HTML stat tile â€” endurance â”€â”€
     const _tillStr = this._fmtTill(endHours);
     const _bEnduStat = getEl('bEnduranceStat');
     if (_bEnduStat) { _bEnduStat.textContent = (isETA ? 'ETA ' : '') + endText; _bEnduStat.style.color = endColor; }
@@ -1291,10 +1310,10 @@ class KFlowCard extends HTMLElement {
 }
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'k-flow-card',
+  type: 'nexa-flow-card',
   name: 'K-Flow Card',
   description: 'Solar Energy Flow Card',
   preview: true,
   version: '7.4.0',
 });
-customElements.define('k-flow-card', KFlowCard);
+customElements.define('nexa-flow-card', NexaFlowCard);
