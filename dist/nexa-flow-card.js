@@ -1,4 +1,4 @@
-﻿// nexa-flow-card.js â€“ Unified Edition v7.4.0
+// nexa-flow-card.js â€“ Unified Edition v7.4.0
 // Changes v7.4.0:
 //   - Labels section: switchRow replaced by header chip (+ Enable / âœ“ Enabled style).
 //   - Per-row auto-enable: each entity picker unlocks only when its label text â‰  default.
@@ -814,7 +814,7 @@ class NexaFlowCard extends HTMLElement {
       .pvi .val.yw{color:#f4d03f} text{font-family:'Segoe UI',Arial,sans-serif}
     </style>
     <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;padding:13px;box-shadow:0 4px 20px rgba(0,0,0,.4);width:100%;box-sizing:border-box;">
-      <div class="ct">âš¡ Energy Flow <span id="battStatusBadge" style="margin-left:auto;font-size:.5rem;font-weight:700;letter-spacing:1.5px;padding:1px 8px;border-radius:8px;background:#21262d;color:#8b949e;text-transform:uppercase">IDLE</span></div>
+      <div class="ct">âš¡ Energy Flow <span id="nexaModeBadge" style="margin-left:auto;margin-right:6px;font-size:.5rem;font-weight:700;letter-spacing:1px;padding:1px 8px;border-radius:8px;background:#21262d;color:#8b949e;text-transform:uppercase">NORMAL</span><span id="battStatusBadge" style="font-size:.5rem;font-weight:700;letter-spacing:1.5px;padding:1px 8px;border-radius:8px;background:#21262d;color:#8b949e;text-transform:uppercase">IDLE</span></div>
       <div style="width:100%;max-width:520px;margin:0 auto"><svg id="flowSvg" viewBox="0 0 520 470" style="width:100%;display:block">
       <defs>
         <filter id="arcSunF" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="7"/></filter>
@@ -915,6 +915,10 @@ class NexaFlowCard extends HTMLElement {
         <div class="st"><div class="l">${this.config.label_min_cell || 'Min Cell'}</div><div class="v" id="bMinCell">-- V</div></div>
         <div class="st"><div class="l">${this.config.label_max_cell || 'Max Cell'}</div><div class="v" id="bMaxCell">-- V</div></div>
         <div class="st"><div class="l">${this.config.label_batt_dis || 'Batt Dis.'}</div><div class="v" id="bBattDis">-- kWh</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px">
+        <div class="st"><div class="l">BATT HEALTH</div><div class="v" id="bHealth">-- %</div></div>
+        <div class="st"><div class="l">BATT CYCLES</div><div class="v" id="bCycles">--</div></div>
       </div>
       <div style="margin-top:4px">
         <div class="st" style="display:flex;flex-direction:row;align-items:flex-end;justify-content:space-between;gap:8px;padding:8px 9px 8px;width:100%;box-sizing:border-box">
@@ -1115,6 +1119,9 @@ class NexaFlowCard extends HTMLElement {
 
     // Color and value for cell tiles â€” handled by label override block below
 
+    setText('bHealth', battHealth + ' %');
+    setText('bCycles', battCycles);
+
     // Endurance
     let endHours = null, endText = '--', endColor = '#8b949e', isETA = false;
     const _socPct = (remCap1 / fullAh) * 100;
@@ -1164,6 +1171,17 @@ class NexaFlowCard extends HTMLElement {
     }
     const badge = getEl('battStatusBadge');
     if (badge) { badge.textContent = absPwr1 < 50 ? 'IDLE' : isCharging1 ? 'CHG' : 'DISCHG'; badge.style.color = absPwr1 < 50 ? '#8b949e' : isCharging1 ? '#00d7ff' : '#3ce878'; }
+
+    const modeBadge = getEl('nexaModeBadge');
+    if (modeBadge) {
+      if (islandModeStr === 'on' || islandModeStr === 'true') {
+        modeBadge.textContent = 'ISLAND';
+        modeBadge.style.color = '#e34d4c';
+      } else {
+        modeBadge.textContent = workModeStr;
+        modeBadge.style.color = '#c9d1d9';
+      }
+    }
 
     setText('invTempFlow', invTemp.toFixed(1) + ' Â°C');
     setText('invNameLabel', this.config.inverter_name || 'INV');
