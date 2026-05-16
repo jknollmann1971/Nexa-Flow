@@ -1,14 +1,14 @@
-// nexa-flow-card.js â€“ Unified Edition v7.4.0
-// Changes v7.4.0:
-//   - Labels section: switchRow replaced by header chip (+ Enable / âœ“ Enabled style).
-//   - Per-row auto-enable: each entity picker unlocks only when its label text â‰  default.
+// nexa-flow-card.js — Unified Edition v1.0.0
+// Changes v1.0.0:
+//   - Labels section: switchRow replaced by header chip (+ Enable / ✓ Enabled style).
+//   - Per-row auto-enable: each entity picker unlocks only when its label text ≠ default.
 //   - Corresponding Battery/Solar pickers lock per-row (not globally).
 //   - _updateDynamic: clean _rowActive + _readNum/_readStr helpers (replaces old monolithic labelsOn check).
 //   - _set: re-renders on any of the 6 label text key changes.
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ════════════════════════════════════════════════════════════════════════════════
 // VISUAL EDITOR
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ════════════════════════════════════════════════════════════════════════════════
 class NexaFlowCardEditor extends HTMLElement {
   constructor() {
     super();
@@ -54,10 +54,10 @@ class NexaFlowCardEditor extends HTMLElement {
     this._config = { ...this._config, [key]: value };
     this._fireChanged();
     if (key === '_show_battery' || key === '_show_battery2' || key === '_show_pv_extra' ||
-        key === '_show_ev'      || key === '_show_limits'   || key === '_labels_custom_entities' ||
-        key === 'label_cell_temp_minmax' || key === 'label_bms_temp'   ||
-        key === 'label_min_cell'         || key === 'label_max_cell'   ||
-        key === 'label_batt_dis'         || key === 'label_total_pv_gen')
+      key === '_show_ev' || key === '_show_limits' || key === '_labels_custom_entities' ||
+      key === 'label_cell_temp_minmax' || key === 'label_bms_temp' ||
+      key === 'label_min_cell' || key === 'label_max_cell' ||
+      key === 'label_batt_dis' || key === 'label_total_pv_gen')
       this._render();
   }
 
@@ -152,9 +152,9 @@ class NexaFlowCardEditor extends HTMLElement {
       sec.className = 'section';
       const hdr = document.createElement('div');
       hdr.className = 'section-header toggleable';
-      // Chevron â€” styled as a small disclosure button
+      // Chevron — styled as a small disclosure button
       const chevron = document.createElement('span');
-      chevron.textContent = isOpen ? 'â–¼' : 'â–¶';
+      chevron.textContent = isOpen ? '▼' : '▶';
       chevron.style.cssText = [
         'display:inline-flex',
         'align-items:center',
@@ -185,7 +185,7 @@ class NexaFlowCardEditor extends HTMLElement {
       if (opts.toggleKey) {
         const chip = document.createElement('span');
         chip.className = 'toggle-chip' + (opts.toggleOn ? ' on' : '');
-        chip.innerHTML = opts.toggleOn ? `âœ“ Enabled` : `ï¼‹ Enable`;
+        chip.innerHTML = opts.toggleOn ? `✓ Enabled` : `＋ Enable`;
         chip.addEventListener('click', (e) => {
           e.stopPropagation();
           this._set(opts.toggleKey, !opts.toggleOn);
@@ -233,8 +233,8 @@ class NexaFlowCardEditor extends HTMLElement {
       return wrap;
     };
 
-    // Text field â€” native input, commits on blur/Enter only.
-    // ha-selector(text) fires value-changed per keystroke â†’ triggers setConfig â†’ _render â†’ destroys field.
+    // Text field — native input, commits on blur/Enter only.
+    // ha-selector(text) fires value-changed per keystroke → triggers setConfig → _render → destroys field.
     const textField = (key, label, placeholder = '') => {
       const wrap = document.createElement('div');
       wrap.className = 'row';
@@ -249,7 +249,7 @@ class NexaFlowCardEditor extends HTMLElement {
         box-sizing:border-box; width:100%;
         transition: border-color .15s;
       `;
-      fieldBox.addEventListener('focusin',  () => { fieldBox.style.borderColor = 'var(--primary-color, #03a9f4)'; });
+      fieldBox.addEventListener('focusin', () => { fieldBox.style.borderColor = 'var(--primary-color, #03a9f4)'; });
       fieldBox.addEventListener('focusout', () => { fieldBox.style.borderColor = 'var(--divider-color, rgba(0,0,0,.42))'; });
       const lbl = document.createElement('div');
       lbl.textContent = label;
@@ -263,7 +263,7 @@ class NexaFlowCardEditor extends HTMLElement {
         background:transparent; color:var(--primary-text-color);
         font-size:.95rem; font-family:inherit; padding:0; box-sizing:border-box;
       `;
-      // Commit ONLY on blur or Enter â€” prevents per-keystroke re-render
+      // Commit ONLY on blur or Enter — prevents per-keystroke re-render
       const commit = (ev) => this._set(key, ev.target.value);
       input.addEventListener('change', commit);
       input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') ev.target.blur(); });
@@ -273,7 +273,7 @@ class NexaFlowCardEditor extends HTMLElement {
       return wrap;
     };
 
-    // Number field â€” native input, commits on blur/Enter only (same reason as textField).
+    // Number field — native input, commits on blur/Enter only (same reason as textField).
     const numberField = (key, label, min, max, step, unit = '') => {
       const wrap = document.createElement('div');
       wrap.className = 'row';
@@ -288,7 +288,7 @@ class NexaFlowCardEditor extends HTMLElement {
         box-sizing:border-box; width:100%;
         transition: border-color .15s;
       `;
-      fieldBox.addEventListener('focusin',  () => { fieldBox.style.borderColor = 'var(--primary-color, #03a9f4)'; });
+      fieldBox.addEventListener('focusin', () => { fieldBox.style.borderColor = 'var(--primary-color, #03a9f4)'; });
       fieldBox.addEventListener('focusout', () => { fieldBox.style.borderColor = 'var(--divider-color, rgba(0,0,0,.42))'; });
       const lbl = document.createElement('div');
       lbl.textContent = unit ? `${label}  (${unit})` : label;
@@ -302,7 +302,7 @@ class NexaFlowCardEditor extends HTMLElement {
         background:transparent; color:var(--primary-text-color);
         font-size:.95rem; font-family:inherit; padding:0; box-sizing:border-box;
       `;
-      // Commit ONLY on blur or Enter â€” prevents per-keystroke re-render
+      // Commit ONLY on blur or Enter — prevents per-keystroke re-render
       const commit = (ev) => { const v = parseFloat(ev.target.value); if (!isNaN(v)) this._set(key, v); };
       input.addEventListener('change', commit);
       input.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') ev.target.blur(); });
@@ -338,11 +338,11 @@ class NexaFlowCardEditor extends HTMLElement {
       cb.checked = !!cfg[key];
       cb.style.cssText = 'opacity:0;width:0;height:0;position:absolute;';
       const track = document.createElement('span');
-      const knob  = document.createElement('span');
+      const knob = document.createElement('span');
       const sync = () => {
         track.style.cssText = 'position:absolute;inset:0;border-radius:11px;transition:background .2s;background:' +
           (cb.checked ? 'var(--primary-color,#03a9f4)' : 'var(--divider-color,rgba(0,0,0,.25))') + ';';
-        knob.style.cssText  = 'position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;' +
+        knob.style.cssText = 'position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;' +
           'box-shadow:0 1px 3px rgba(0,0,0,.35);transition:left .2s;left:' + (cb.checked ? '21px' : '3px') + ';';
       };
       sync();
@@ -361,14 +361,14 @@ class NexaFlowCardEditor extends HTMLElement {
       return d;
     };
 
-    // â•â•â• Build sections â•â•â•
-    shell.appendChild(makeSection('general', 'âš™ï¸', 'General', [
+    // ─── Build sections ───
+    shell.appendChild(makeSection('general', '⚙️', 'General', [
       textField('inverter_name', 'Inverter Name', 'z.B. Nexa 2000'),
       picker('nexa_work_mode', 'Work Mode Sensor', true),
       picker('nexa_island_mode', 'Island Mode Schalter', true),
     ]));
 
-    // â”€â”€ Labels: global gate + per-row activation â”€â”€
+    // ─── Labels: global gate + per-row activation ───
     // Gate: section chip toggles _labels_custom_entities (body hidden when off).
     // Per-row: entity picker activates only when that row's label text differs from its default.
     const labelsEnabled = !!(cfg._labels_custom_entities);
@@ -392,23 +392,23 @@ class NexaFlowCardEditor extends HTMLElement {
           'color:var(--secondary-text-color)', 'letter-spacing:.3px',
           'pointer-events:none', 'z-index:11',
         ].join(';');
-        note.textContent = 'â›” Overridden by Labels section';
+        note.textContent = '⛔ Overridden by Labels section';
         wrap.appendChild(veil);
         wrap.appendChild(note);
       }
       return wrap;
     };
 
-    // Per-row active: true when global gate is ON and label text â‰  default
+    // Per-row active: true when global gate is ON and label text ≠ default
     const _labelChanged = (key, def) => labelsEnabled && (cfg[key] || def) !== def;
-    const cellTempActive   = _labelChanged('label_cell_temp_minmax', 'CELL TEMP MIN/MAX');
-    const bmsTempActive    = _labelChanged('label_bms_temp',         'BMS TEMP');
-    const minCellActive    = _labelChanged('label_min_cell',         'Min Cell');
-    const maxCellActive    = _labelChanged('label_max_cell',         'Max Cell');
-    const battDisActive    = _labelChanged('label_batt_dis',         'Batt Dis.');
-    const totalPvGenActive = _labelChanged('label_total_pv_gen',     'TOTAL PV GEN.');
+    const cellTempActive = _labelChanged('label_cell_temp_minmax', 'CELL TEMP MIN/MAX');
+    const bmsTempActive = _labelChanged('label_bms_temp', 'BMS TEMP');
+    const minCellActive = _labelChanged('label_min_cell', 'Min Cell');
+    const maxCellActive = _labelChanged('label_max_cell', 'Max Cell');
+    const battDisActive = _labelChanged('label_batt_dis', 'Batt Dis.');
+    const totalPvGenActive = _labelChanged('label_total_pv_gen', 'TOTAL PV GEN.');
 
-    // Label rows â€” text field + entity picker; picker active only when row is active
+    // Label rows — text field + entity picker; picker active only when row is active
     const labelRow = (textKey, textLabel, textPlaceholder, entityKey, active = false) => {
       const frag = document.createDocumentFragment();
       frag.appendChild(textField(textKey, textLabel, textPlaceholder));
@@ -416,7 +416,7 @@ class NexaFlowCardEditor extends HTMLElement {
       entityRow.style.cssText = 'margin-top:-6px;margin-bottom:14px;';
       const entityLabel = document.createElement('div');
       entityLabel.style.cssText = 'font-size:.72rem;color:var(--secondary-text-color);padding:0 2px 3px;line-height:1;';
-      entityLabel.textContent = active ? 'Entity (overrides default)' : 'Entity â€” change label to unlock';
+      entityLabel.textContent = active ? 'Entity (overrides default)' : 'Entity — change label to unlock';
       const sel = document.createElement('ha-selector');
       sel.hass = this._hass;
       sel.selector = { entity: {} };
@@ -448,91 +448,91 @@ class NexaFlowCardEditor extends HTMLElement {
       return info;
     })();
 
-    shell.appendChild(makeSection('labels', 'ðŸ·ï¸', 'Labels', [
+    shell.appendChild(makeSection('labels', '🏷️', 'Labels', [
       labelInfoBanner,
       labelRow('label_cell_temp_minmax', 'Cell Temp Min/Max label', 'CELL TEMP MIN/MAX', 'label_entity_cell_temp', cellTempActive),
-      labelRow('label_bms_temp',         'BMS Temp label',          'BMS TEMP',          'label_entity_bms_temp',  bmsTempActive),
-      labelRow('label_min_cell',         'Min Cell label',          'Min Cell',          'label_entity_min_cell',  minCellActive),
-      labelRow('label_max_cell',         'Max Cell label',          'Max Cell',          'label_entity_max_cell',  maxCellActive),
-      labelRow('label_batt_dis',         'Batt Dis label',          'Batt Dis.',         'label_entity_batt_dis',  battDisActive),
-      labelRow('label_total_pv_gen',     'Total PV Gen label',      'TOTAL PV GEN.',     'total_pv_gen_entity',    totalPvGenActive),
+      labelRow('label_bms_temp', 'BMS Temp label', 'BMS TEMP', 'label_entity_bms_temp', bmsTempActive),
+      labelRow('label_min_cell', 'Min Cell label', 'Min Cell', 'label_entity_min_cell', minCellActive),
+      labelRow('label_max_cell', 'Max Cell label', 'Max Cell', 'label_entity_max_cell', maxCellActive),
+      labelRow('label_batt_dis', 'Batt Dis label', 'Batt Dis.', 'label_entity_batt_dis', battDisActive),
+      labelRow('label_total_pv_gen', 'Total PV Gen label', 'TOTAL PV GEN.', 'total_pv_gen_entity', totalPvGenActive),
     ], { toggleKey: '_labels_custom_entities', toggleOn: labelsEnabled, hidden: !labelsEnabled }));
 
-    shell.appendChild(makeSection('solar', 'â˜€ï¸', 'Solar', [
+    shell.appendChild(makeSection('solar', '☀️', 'Solar', [
       picker('pv1_power', 'PV1 Power'),
       picker('pv2_power', 'PV2 Power'),
     ]));
 
-    shell.appendChild(makeSection('solar_extra', 'â˜€ï¸', 'Extra PV Strings', [
+    shell.appendChild(makeSection('solar_extra', '☀️', 'Extra PV Strings', [
       picker('pv3_power', 'PV3 Power', true),
       picker('pv4_power', 'PV4 Power', true),
     ], { toggleKey: '_show_pv_extra', toggleOn: showPVExtra, hidden: !showPVExtra }));
 
-    shell.appendChild(makeSection('solar_extras', 'â˜€ï¸', 'Solar Extras', [
-      picker('pv_total_power',  'Total PV Power',  true),
+    shell.appendChild(makeSection('solar_extras', '☀️', 'Solar Extras', [
+      picker('pv_total_power', 'Total PV Power', true),
       divider(),
-      picker('inv_temp',        'Inverter Temp'),
-      picker('today_pv',        'Today PV Gen'),
-      picker('today_batt_chg',  'Today Batt Charge'),
-      picker('today_load',      'Today Load'),
-      picker('consump',         'House Consumption'),
+      picker('inv_temp', 'Inverter Temp'),
+      picker('today_pv', 'Today PV Gen'),
+      picker('today_batt_chg', 'Today Batt Charge'),
+      picker('today_load', 'Today Load'),
+      picker('consump', 'House Consumption'),
       divider(),
       textField('label_total_pv_gen', 'Total PV Generation label', 'TOTAL PV GEN.'),
       pickerMaybeDisabled('total_pv_gen_entity', 'Total PV Generation', totalPvGenActive),
     ]));
 
-    shell.appendChild(makeSection('grid', 'ðŸ”Œ', 'Grid', [
-      switchRow('invert_grid_power', 'ðŸ”„ Invert grid power sign', 'Enable if positive = exporting (e.g. Growatt Nexa active_power)'),
+    shell.appendChild(makeSection('grid', '🔌', 'Grid', [
+      switchRow('invert_grid_power', '🔄 Invert grid power sign', 'Enable if positive = exporting (e.g. GoodWe active_power)'),
       divider(),
-      picker('grid_active_power',  'Grid Active Power'),
+      picker('grid_active_power', 'Grid Active Power'),
       picker('grid_import_energy', 'Grid Import Energy'),
       picker('grid_export_energy', 'Grid Export Energy', true),
-      picker('grid_power_alt',     'Alt Grid Sensor',    true),
+      picker('grid_power_alt', 'Alt Grid Sensor', true),
     ]));
 
-    shell.appendChild(makeSection('battery1', 'ðŸ”‹', 'Primary Battery', [
-      switchRow('invert_battery_power', 'ðŸ”„ Invert battery power sign', 'Enable if positive = discharging'),
+    shell.appendChild(makeSection('battery1', '🔋', 'Primary Battery', [
+      switchRow('invert_battery_power', '🔄 Invert battery power sign', 'Enable if positive = discharging'),
       divider(),
-      picker('battery_soc',      'Battery SOC'),
-      picker('battery_power',    'Battery Power'),
-      picker('battery_current',  'Battery Current'),
-      picker('battery_voltage',  'Battery Voltage'),
+      picker('battery_soc', 'Battery SOC'),
+      picker('battery_power', 'Battery Power'),
+      picker('battery_current', 'Battery Current'),
+      picker('battery_voltage', 'Battery Voltage'),
       picker('nexa_batt_health', 'Battery Health (%)', true),
       picker('nexa_batt_cycles', 'Battery Cycles', true),
-      pickerMaybeDisabled('battery_temp1',    'Temp 1',             cellTempActive),
-      pickerMaybeDisabled('battery_temp2',    'Temp 2',             cellTempActive),
-      pickerMaybeDisabled('battery_mos',      'BMS Temp',           bmsTempActive),
-      pickerMaybeDisabled('battery_min_cell', 'Min Cell Voltage',   minCellActive),
-      pickerMaybeDisabled('battery_max_cell', 'Max Cell Voltage',   maxCellActive),
-      pickerMaybeDisabled('batt_dis',         'Discharge Today',    battDisActive),
+      pickerMaybeDisabled('battery_temp1', 'Temp 1', cellTempActive),
+      pickerMaybeDisabled('battery_temp2', 'Temp 2', cellTempActive),
+      pickerMaybeDisabled('battery_mos', 'BMS Temp', bmsTempActive),
+      pickerMaybeDisabled('battery_min_cell', 'Min Cell Voltage', minCellActive),
+      pickerMaybeDisabled('battery_max_cell', 'Max Cell Voltage', maxCellActive),
+      pickerMaybeDisabled('batt_dis', 'Discharge Today', battDisActive),
       divider(),
-      picker('fallback_battery_soc',  'Fallback SOC',     true),
-      picker('fallback_battery_curr', 'Fallback Current', true),
+      picker('goodwe_battery_soc', 'Fallback SOC', true),
+      picker('goodwe_battery_curr', 'Fallback Current', true),
     ], { toggleKey: '_show_battery', toggleOn: showBatt1, hidden: !showBatt1 }));
 
-    shell.appendChild(makeSection('battery2', 'ðŸ”‹', 'Secondary Battery', [
-      switchRow('invert_battery_power', 'ðŸ”„ Invert battery power sign', 'Shared with Primary'),
+    shell.appendChild(makeSection('battery2', '🔋', 'Secondary Battery', [
+      switchRow('invert_battery_power', '🔄 Invert battery power sign', 'Shared with Primary'),
       divider(),
-      picker('battery2_soc',      'SOC'),
-      picker('battery2_power',    'Power'),
-      picker('battery2_current',  'Current'),
+      picker('battery2_soc', 'SOC'),
+      picker('battery2_power', 'Power'),
+      picker('battery2_current', 'Current'),
       picker('battery2_voltage', 'Voltage'),
-      pickerMaybeDisabled('battery2_mos',     'BMS Temp', bmsTempActive),
+      pickerMaybeDisabled('battery2_mos', 'BMS Temp', bmsTempActive),
     ], { toggleKey: '_show_battery2', toggleOn: showBatt2, hidden: !showBatt2 }));
 
-    shell.appendChild(makeSection('limits', 'âš™ï¸', 'System Limits', [
-      numberField('battery_full_ah',    'Battery Capacity',  0, 2000,  1,   'Ah'),
-      numberField('battery_full_wh',    'Battery Capacity',  0, 50000, 1,   'Wh'),
-      numberField('inverter_max_power', 'Inverter Max Power',1000,20000,100, 'W'),
-      numberField('pv_max_power',       'PV Max Power',      1000,30000,100, 'W'),
+    shell.appendChild(makeSection('limits', '⚙️', 'System Limits', [
+      numberField('battery_full_ah', 'Battery Capacity', 0, 2000, 1, 'Ah'),
+      numberField('battery_full_wh', 'Battery Capacity', 0, 50000, 1, 'Wh'),
+      numberField('inverter_max_power', 'Inverter Max Power', 1000, 20000, 100, 'W'),
+      numberField('pv_max_power', 'PV Max Power', 1000, 30000, 100, 'W'),
     ], { toggleKey: '_show_limits', toggleOn: showLimits, hidden: !showLimits }));
 
-    shell.appendChild(makeSection('ev', 'ðŸš—', 'EV / Car Charger', [
-      picker('charger_state',           'Charger State'),
-      picker('charger_power',           'Charger Power'),
-      picker('charger_current',         'Charger Current'),
-      picker('charger_soc',             'Car Battery SOC'),
-      picker('charger_eta',             'Charge ETA (min)', true),
+    shell.appendChild(makeSection('ev', '🚗', 'EV / Car Charger', [
+      picker('charger_state', 'Charger State'),
+      picker('charger_power', 'Charger Power'),
+      picker('charger_current', 'Charger Current'),
+      picker('charger_soc', 'Car Battery SOC'),
+      picker('charger_eta', 'Charge ETA (min)', true),
       numberField('charger_battery_capacity_wh', 'EV Battery Capacity', 0, 200000, 1, 'Wh'),
     ], { toggleKey: '_show_ev', toggleOn: showEV, hidden: !showEV }));
 
@@ -543,9 +543,9 @@ class NexaFlowCardEditor extends HTMLElement {
 }
 customElements.define('nexa-flow-card-editor', NexaFlowCardEditor);
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ════════════════════════════════════════════════════════════════════════════════
 // MAIN CARD
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ════════════════════════════════════════════════════════════════════════════════
 class NexaFlowCard extends HTMLElement {
   constructor() {
     super();
@@ -570,29 +570,29 @@ class NexaFlowCard extends HTMLElement {
       battery_min_cell: 'sensor.growatt_0hvrb0zr23jt00yy_battery_1_min_cell_voltage',
       battery_max_cell: 'sensor.growatt_0hvrb0zr23jt00yy_battery_1_max_cell_voltage',
       total_pv_gen_entity: 'sensor.growatt_0hvrb0zr23jt00yy_pv_energy_total',
-      
+
       // --- NEUE Nexa Sensoren ---
       nexa_work_mode: 'sensor.growatt_0hvrb0zr23jt00yy_work_mode',
       nexa_island_mode: 'switch.growatt_0hvrb0zr23jt00yy_island_mode_enabled',
       nexa_batt_health: 'sensor.growatt_0hvrb0zr23jt00yy_battery_health',
       nexa_batt_cycles: 'sensor.growatt_0hvrb0zr23jt00yy_battery_cycle_count',
-      
+
       // Restliche Standards...
-      pv1_power: 'sensor.growatt_pv1_power',
-      pv2_power: 'sensor.growatt_pv2_power',
+      pv1_power: 'sensor.goodwe_pv1_power',
+      pv2_power: 'sensor.goodwe_pv2_power',
       pv3_power: '',
       pv4_power: '',
-      grid_import_energy: 'sensor.growatt_today_energy_import',
+      grid_import_energy: 'sensor.goodwe_today_energy_import',
       grid_export_energy: '',
-      today_batt_chg: 'sensor.growatt_today_battery_charge',
-      today_load: 'sensor.growatt_today_load',
-      battery_current: 'sensor.growatt_current',
-      battery_voltage: 'sensor.growatt_voltage',
-      battery_temp2: 'sensor.growatt_temp2',
-      battery_mos: 'sensor.growatt_mos',
-      fallback_battery_soc: 'sensor.growatt_battery_state_of_charge',
-      fallback_battery_curr: 'sensor.fallback_battery_current',
-      batt_dis: 'sensor.growatt_today_battery_discharge',
+      today_batt_chg: 'sensor.goodwe_today_battery_charge',
+      today_load: 'sensor.goodwe_today_load',
+      battery_current: 'sensor.jk_current',
+      battery_voltage: 'sensor.jk_voltage',
+      battery_temp2: 'sensor.jk_temp2',
+      battery_mos: 'sensor.jk_mos',
+      goodwe_battery_soc: 'sensor.goodwe_battery_state_of_charge',
+      goodwe_battery_curr: 'sensor.goodwe_battery_current',
+      batt_dis: 'sensor.goodwe_today_battery_discharge',
       battery2_soc: '',
       battery2_power: '',
       battery2_current: '',
@@ -657,12 +657,12 @@ class NexaFlowCard extends HTMLElement {
     return s ? String(s.state).toLowerCase() : '';
   }
 
-  _socColor(p) { return p<=25?'#f85149':p<=50?'#f39c4b':p<=75?'#58a6ff':'#4CAF50'; }
-  _cellTempColor(t) { return t<=15?'#58a6ff':t<=35?'#3fb950':t<=45?'#f0883e':'#f85149'; }
-  _cellVoltColor(v) { if(v<=0.001)return'#8b949e'; if(v<3.0)return'#f85149'; if(v<3.1)return'#f39c4b'; if(v<3.4)return'#f4d03f'; if(v<=3.65)return'#3fb950'; return'#f85149'; }
-  _tempColor(t) { return t<=25?'#3fb950':t<=45?'#f0883e':'#f85149'; }
-  _remCapColor(p) { return p<=15?'#e34d4c':p<=30?'#f39c4b':p<=55?'#f4d03f':'#2ecc71'; }
-  _fmtTime(h) { if(!isFinite(h)||h<=0) return'--';const hh=Math.floor(h),mm=Math.round((h-hh)*60);return hh+'h '+(mm<10?'0':'')+mm+'m'; }
+  _socColor(p) { return p <= 25 ? '#f85149' : p <= 50 ? '#f39c4b' : p <= 75 ? '#58a6ff' : '#4CAF50'; }
+  _cellTempColor(t) { return t <= 15 ? '#58a6ff' : t <= 35 ? '#3fb950' : t <= 45 ? '#f0883e' : '#f85149'; }
+  _cellVoltColor(v) { if (v <= 0.001) return '#8b949e'; if (v < 3.0) return '#f85149'; if (v < 3.1) return '#f39c4b'; if (v < 3.4) return '#f4d03f'; if (v <= 3.65) return '#3fb950'; return '#f85149'; }
+  _tempColor(t) { return t <= 25 ? '#3fb950' : t <= 45 ? '#f0883e' : '#f85149'; }
+  _remCapColor(p) { return p <= 15 ? '#e34d4c' : p <= 30 ? '#f39c4b' : p <= 55 ? '#f4d03f' : '#2ecc71'; }
+  _fmtTime(h) { if (!isFinite(h) || h <= 0) return '--'; const hh = Math.floor(h), mm = Math.round((h - hh) * 60); return hh + 'h ' + (mm < 10 ? '0' : '') + mm + 'm'; }
   _fmtEndurance(h) {
     if (!isFinite(h) || h <= 0) return '--';
     const days = Math.floor(h / 24), hrs = Math.floor(h % 24), mins = Math.round((h - Math.floor(h)) * 60);
@@ -672,60 +672,60 @@ class NexaFlowCard extends HTMLElement {
   _fmtTill(h) {
     if (!isFinite(h) || h <= 0) return 'Till --';
     const target = new Date(Date.now() + h * 3600000);
-    const day = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][target.getDay()];
+    const day = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][target.getDay()];
     let hr = target.getHours(); const ampm = hr >= 12 ? 'PM' : 'AM';
     hr = hr % 12 || 12;
-    return 'Till ' + day + ' ' + hr + ':' + target.getMinutes().toString().padStart(2,'0') + ' ' + ampm;
+    return 'Till ' + day + ' ' + hr + ':' + target.getMinutes().toString().padStart(2, '0') + ' ' + ampm;
   }
 
   _sunData() {
     const attrs = this._hass?.states[this.config.sun || 'sun.sun']?.attributes;
     let rise = '06:00', set = '18:00';
     const fmtIso = iso => {
-      try { const d = new Date(iso); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); } catch(e) { return null; }
+      try { const d = new Date(iso); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); } catch (e) { return null; }
     };
     if (attrs) {
       if (attrs.next_rising) rise = fmtIso(attrs.next_rising) || rise;
       if (attrs.next_setting) set = fmtIso(attrs.next_setting) || set;
     }
-    const toMin = s => { const p = s.split(':').map(Number); return p[0]*60 + p[1]; };
-    const NOW = new Date(), nowMin = NOW.getHours()*60 + NOW.getMinutes();
+    const toMin = s => { const p = s.split(':').map(Number); return p[0] * 60 + p[1]; };
+    const NOW = new Date(), nowMin = NOW.getHours() * 60 + NOW.getMinutes();
     const RISE = toMin(rise), SET = toMin(set);
     let t = Math.max(0, Math.min(1, (nowMin - RISE) / (SET - RISE)));
     const night = nowMin < RISE || nowMin > SET;
-    const bell = 1 - Math.pow(Math.abs(2*t - 1), 1.5);
-    const bx = Math.round((1-t)*(1-t)*35 + 2*(1-t)*t*260 + t*t*485);
-    const by = Math.round((1-t)*(1-t)*78 + 2*(1-t)*t*(-45) + t*t*78);
+    const bell = 1 - Math.pow(Math.abs(2 * t - 1), 1.5);
+    const bx = Math.round((1 - t) * (1 - t) * 35 + 2 * (1 - t) * t * 260 + t * t * 485);
+    const by = Math.round((1 - t) * (1 - t) * 78 + 2 * (1 - t) * t * (-45) + t * t * 78);
     let mx = 260, my = 72;
     if (night) {
       const nightLen = 1440 - (SET - RISE);
-      let tMoon = nowMin > SET ? (nowMin - SET)/nightLen : (nowMin + 1440 - SET)/nightLen;
+      let tMoon = nowMin > SET ? (nowMin - SET) / nightLen : (nowMin + 1440 - SET) / nightLen;
       tMoon = Math.max(0, Math.min(1, tMoon));
-      mx = Math.round((1-tMoon)*(1-tMoon)*485 + 2*(1-tMoon)*tMoon*260 + tMoon*tMoon*35);
-      my = Math.round((1-tMoon)*(1-tMoon)*78 + 2*(1-tMoon)*tMoon*158 + tMoon*tMoon*78);
+      mx = Math.round((1 - tMoon) * (1 - tMoon) * 485 + 2 * (1 - tMoon) * tMoon * 260 + tMoon * tMoon * 35);
+      my = Math.round((1 - tMoon) * (1 - tMoon) * 78 + 2 * (1 - tMoon) * tMoon * 158 + tMoon * tMoon * 78);
     }
     return { rise, set, night, bell, bx, by, mx, my, t };
   }
 
-  _battFill(soc){
-    const ft=145,fb=263,fh=118;const fH=Math.round((soc||0)/100*fh),fY=fb-fH;let c,f,tc;
-    if(soc<=20){c='#ff2200';f='url(#battGlowRed)';tc='#000';}else if(soc<=40){c='#f4d03f';f='url(#battGlowOrange)';tc='#000';}else if(soc<=75){c='#44ff00';f='url(#battGlowGreen)';tc='#fff';}else{c='#00d4ff';f='url(#battGlowCyan)';tc='#fff';}
-    return{y:fY,height:fH,color:c,filter:fH>4?f:'none',textColor:tc};
+  _battFill(soc) {
+    const ft = 145, fb = 263, fh = 118; const fH = Math.round((soc || 0) / 100 * fh), fY = fb - fH; let c, f, tc;
+    if (soc <= 20) { c = '#ff2200'; f = 'url(#battGlowRed)'; tc = '#000'; } else if (soc <= 40) { c = '#f4d03f'; f = 'url(#battGlowOrange)'; tc = '#000'; } else if (soc <= 75) { c = '#44ff00'; f = 'url(#battGlowGreen)'; tc = '#fff'; } else { c = '#00d4ff'; f = 'url(#battGlowCyan)'; tc = '#fff'; }
+    return { y: fY, height: fH, color: c, filter: fH > 4 ? f : 'none', textColor: tc };
   }
 
-  _flowLevel(w,type){
-    if(type==='solar'){if(w<200)return{dur:4,size:1.8,count:6};if(w<600)return{dur:3.2,size:2.2,count:12};if(w<1200)return{dur:2.7,size:2.5,count:20};if(w<2500)return{dur:2.4,size:2.8,count:30};if(w<4000)return{dur:1.8,size:3.2,count:42};if(w<6000)return{dur:1.2,size:3.5,count:55};return{dur:.9,size:3.8,count:65};}
-    if(w<150)return{dur:4,size:1.8,count:4};if(w<500)return{dur:3.2,size:2.2,count:8};if(w<1000)return{dur:2.7,size:2.5,count:14};if(w<2000)return{dur:2.4,size:2.8,count:22};if(w<3000)return{dur:1.8,size:3.2,count:30};if(w<4500)return{dur:1.5,size:3.5,count:40};return{dur:.9,size:3.8,count:50};
+  _flowLevel(w, type) {
+    if (type === 'solar') { if (w < 200) return { dur: 4, size: 1.8, count: 6 }; if (w < 600) return { dur: 3.2, size: 2.2, count: 12 }; if (w < 1200) return { dur: 2.7, size: 2.5, count: 20 }; if (w < 2500) return { dur: 2.4, size: 2.8, count: 30 }; if (w < 4000) return { dur: 1.8, size: 3.2, count: 42 }; if (w < 6000) return { dur: 1.2, size: 3.5, count: 55 }; return { dur: .9, size: 3.8, count: 65 }; }
+    if (w < 150) return { dur: 4, size: 1.8, count: 4 }; if (w < 500) return { dur: 3.2, size: 2.2, count: 8 }; if (w < 1000) return { dur: 2.7, size: 2.5, count: 14 }; if (w < 2000) return { dur: 2.4, size: 2.8, count: 22 }; if (w < 3000) return { dur: 1.8, size: 3.2, count: 30 }; if (w < 4500) return { dur: 1.5, size: 3.5, count: 40 }; return { dur: .9, size: 3.8, count: 50 };
   }
 
-  _buildPvWaveHTML(bx,by,pvT){
-    if(pvT<=10)return'';const fl=this._flowLevel(pvT,'solar');const sY=by+7;const pD='M '+bx.toFixed(1)+','+sY.toFixed(1)+' C '+bx.toFixed(1)+',85 260,5 260,155';const col='rgba(255,232,60,.95)',gc='rgba(255,190,20,.55)';const dD=(fl.dur*.8).toFixed(2),dL=(8+fl.size*1.5).toFixed(1),gL=(6+fl.size*1.2).toFixed(1),dT=(parseFloat(dL)+parseFloat(gL)).toFixed(1);let h='';h+='<path d="'+pD+'" fill="none" stroke="'+gc+'" stroke-width="6" stroke-dasharray="'+dL+' '+gL+'" stroke-linecap="round" opacity="0.25" filter="url(#arcSunF2)"><animate attributeName="stroke-dashoffset" from="'+dT+'" to="0" dur="'+dD+'s" repeatCount="indefinite" calcMode="linear"/></path>';h+='<path d="'+pD+'" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.8" stroke-dasharray="'+dL+' '+gL+'" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="'+dT+'" to="0" dur="'+dD+'s" repeatCount="indefinite" calcMode="linear"/></path>';h+='<path d="'+pD+'" fill="none" stroke="'+col+'" stroke-width="1.0" stroke-dasharray="'+dL+' '+gL+'" stroke-linecap="round" opacity="0.85"><animate attributeName="stroke-dashoffset" from="'+dT+'" to="0" dur="'+dD+'s" repeatCount="indefinite" calcMode="linear"/></path>';const wD=[{amp:6,dur:fl.dur*.9,ox:0,op:.9,sc:'rgba(255,255,255,0.92)',dLen:'3.0',dGap:'40.0'},{amp:10,dur:fl.dur*1.1,ox:3,op:.6,sc:col,dLen:'4.5',dGap:'50.0'}];const wc=Math.min(2,Math.max(1,Math.round(fl.count/5)));for(let wi=0;wi<wc;wi++){const w=wD[wi];const sC=Math.round(fl.count*.5),sD=w.dur.toFixed(2),sCy=(parseFloat(w.dLen)+parseFloat(w.dGap)).toFixed(1);for(let si=0;si<sC;si++){const fr=si/sC,ph=fr*Math.PI*2,sY2=(w.amp*Math.sin(ph+wi*1.1)).toFixed(1),sX=(w.ox+w.amp*.3*Math.cos(ph*.5)).toFixed(1),sDe=(fr*w.dur%w.dur).toFixed(3),sO=(w.op*(.5+.5*Math.abs(Math.sin(ph)))*.6).toFixed(2);h+='<g transform="translate('+sX+','+sY2+')"><path d="'+pD+'" fill="none" stroke="'+w.sc+'" stroke-width="1.2" stroke-dasharray="'+w.dLen+' '+w.dGap+'" stroke-linecap="round" opacity="'+sO+'"><animate attributeName="stroke-dashoffset" from="'+sCy+'" to="0" dur="'+sD+'s" begin="-'+sDe+'s" repeatCount="indefinite" calcMode="linear"/></path></g>';}}return h;
+  _buildPvWaveHTML(bx, by, pvT) {
+    if (pvT <= 10) return ''; const fl = this._flowLevel(pvT, 'solar'); const sY = by + 7; const pD = 'M ' + bx.toFixed(1) + ',' + sY.toFixed(1) + ' C ' + bx.toFixed(1) + ',85 260,5 260,155'; const col = 'rgba(255,232,60,.95)', gc = 'rgba(255,190,20,.55)'; const dD = (fl.dur * .8).toFixed(2), dL = (8 + fl.size * 1.5).toFixed(1), gL = (6 + fl.size * 1.2).toFixed(1), dT = (parseFloat(dL) + parseFloat(gL)).toFixed(1); let h = ''; h += '<path d="' + pD + '" fill="none" stroke="' + gc + '" stroke-width="6" stroke-dasharray="' + dL + ' ' + gL + '" stroke-linecap="round" opacity="0.25" filter="url(#arcSunF2)"><animate attributeName="stroke-dashoffset" from="' + dT + '" to="0" dur="' + dD + 's" repeatCount="indefinite" calcMode="linear"/></path>'; h += '<path d="' + pD + '" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.8" stroke-dasharray="' + dL + ' ' + gL + '" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="' + dT + '" to="0" dur="' + dD + 's" repeatCount="indefinite" calcMode="linear"/></path>'; h += '<path d="' + pD + '" fill="none" stroke="' + col + '" stroke-width="1.0" stroke-dasharray="' + dL + ' ' + gL + '" stroke-linecap="round" opacity="0.85"><animate attributeName="stroke-dashoffset" from="' + dT + '" to="0" dur="' + dD + 's" repeatCount="indefinite" calcMode="linear"/></path>'; const wD = [{ amp: 6, dur: fl.dur * .9, ox: 0, op: .9, sc: 'rgba(255,255,255,0.92)', dLen: '3.0', dGap: '40.0' }, { amp: 10, dur: fl.dur * 1.1, ox: 3, op: .6, sc: col, dLen: '4.5', dGap: '50.0' }]; const wc = Math.min(2, Math.max(1, Math.round(fl.count / 5))); for (let wi = 0; wi < wc; wi++) { const w = wD[wi]; const sC = Math.round(fl.count * .5), sD = w.dur.toFixed(2), sCy = (parseFloat(w.dLen) + parseFloat(w.dGap)).toFixed(1); for (let si = 0; si < sC; si++) { const fr = si / sC, ph = fr * Math.PI * 2, sY2 = (w.amp * Math.sin(ph + wi * 1.1)).toFixed(1), sX = (w.ox + w.amp * .3 * Math.cos(ph * .5)).toFixed(1), sDe = (fr * w.dur % w.dur).toFixed(3), sO = (w.op * (.5 + .5 * Math.abs(Math.sin(ph))) * .6).toFixed(2); h += '<g transform="translate(' + sX + ',' + sY2 + ')"><path d="' + pD + '" fill="none" stroke="' + w.sc + '" stroke-width="1.2" stroke-dasharray="' + w.dLen + ' ' + w.dGap + '" stroke-linecap="round" opacity="' + sO + '"><animate attributeName="stroke-dashoffset" from="' + sCy + '" to="0" dur="' + sD + 's" begin="-' + sDe + 's" repeatCount="indefinite" calcMode="linear"/></path></g>'; } } return h;
   }
 
   _buildStaticSVG() {
     const dual = !!(this.config._show_battery2);
     const showBatt1 = !!(this.config._show_battery !== false);
-    const ev   = !!(this.config._show_ev);
+    const ev = !!(this.config._show_ev);
     const showPvExtra = !!(this.config._show_pv_extra);
     const iconPath = '/local/community/nexa-flow-card';    // icons served from HACS community folder
 
@@ -740,10 +740,10 @@ class NexaFlowCard extends HTMLElement {
         <animate attributeName="stroke-dashoffset" from="-14" to="0" dur="0.8s" repeatCount="indefinite"/>
       </path>
       <image id="evIconImg" href="${iconPath}/ev-charger-icon.png" x="${evX}" y="${evY}" width="79" height="79" preserveAspectRatio="xMidYMid meet"/>
-      <text id="evPowerVal" x="${evX+39.5}" y="${evY+98}" text-anchor="middle" font-size="10" font-weight="600" fill="#29c4f6">-- W</text>
-      <text id="evCurrentVal" x="${evX+39.5}" y="${evY+110}" text-anchor="middle" font-size="9" fill="#cde">-- A</text>
-      <text id="evSocVal" x="${evX+39.5}" y="${evY+122}" text-anchor="middle" font-size="9" fill="#fff">-- %</text>
-      <text id="evEtaVal" x="${evX+39.5}" y="${evY+134}" text-anchor="middle" font-size="10" font-weight="600" fill="#4ade80">--</text>
+      <text id="evPowerVal" x="${evX + 39.5}" y="${evY + 98}" text-anchor="middle" font-size="10" font-weight="600" fill="#29c4f6">-- W</text>
+      <text id="evCurrentVal" x="${evX + 39.5}" y="${evY + 110}" text-anchor="middle" font-size="9" fill="#cde">-- A</text>
+      <text id="evSocVal" x="${evX + 39.5}" y="${evY + 122}" text-anchor="middle" font-size="9" fill="#fff">-- %</text>
+      <text id="evEtaVal" x="${evX + 39.5}" y="${evY + 134}" text-anchor="middle" font-size="10" font-weight="600" fill="#4ade80">--</text>
     </g>` : '';
 
     // Battery current/power placed OUTSIDE the transformed group, above/below the flow bar (center y=175)
@@ -760,7 +760,7 @@ class NexaFlowCard extends HTMLElement {
 
     const batteryTip = `<rect x="75" y="126" width="18" height="4" rx="2" fill="url(#battCapGrad)"/>`;
 
-    // Battery visibility helpers â€“ mirror EV charger pattern
+    // Battery visibility helpers — mirror EV charger pattern
     const battGhostPath = showBatt1
       ? `<path d="M 59,175 H 132 V 205 H 205" fill="none" stroke="#1e3a5f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.18"/>`
       : '';
@@ -814,7 +814,7 @@ class NexaFlowCard extends HTMLElement {
       .pvi .val.yw{color:#f4d03f} text{font-family:'Segoe UI',Arial,sans-serif}
     </style>
     <div style="background:#161b22;border:1px solid #21262d;border-radius:12px;padding:13px;box-shadow:0 4px 20px rgba(0,0,0,.4);width:100%;box-sizing:border-box;">
-      <div class="ct">âš¡ Energy Flow <span id="nexaModeBadge" style="margin-left:auto;margin-right:6px;font-size:.5rem;font-weight:700;letter-spacing:1px;padding:1px 8px;border-radius:8px;background:#21262d;color:#8b949e;text-transform:uppercase">NORMAL</span><span id="battStatusBadge" style="font-size:.5rem;font-weight:700;letter-spacing:1.5px;padding:1px 8px;border-radius:8px;background:#21262d;color:#8b949e;text-transform:uppercase">IDLE</span></div>
+      <div class="ct">⚡ Energy Flow <span id="nexaModeBadge" style="margin-left:auto;margin-right:6px;font-size:.5rem;font-weight:700;letter-spacing:1px;padding:1px 8px;border-radius:8px;background:#21262d;color:#8b949e;text-transform:uppercase">NORMAL</span><span id="battStatusBadge" style="font-size:.5rem;font-weight:700;letter-spacing:1.5px;padding:1px 8px;border-radius:8px;background:#21262d;color:#8b949e;text-transform:uppercase">IDLE</span></div>
       <div style="width:100%;max-width:520px;margin:0 auto"><svg id="flowSvg" viewBox="0 0 520 470" style="width:100%;display:block">
       <defs>
         <filter id="arcSunF" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="7"/></filter>
@@ -828,7 +828,7 @@ class NexaFlowCard extends HTMLElement {
         <linearGradient id="battShellGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#050505"/><stop offset="18%" stop-color="#111"/><stop offset="50%" stop-color="#080808"/><stop offset="82%" stop-color="#111"/><stop offset="100%" stop-color="#030303"/></linearGradient>
         <linearGradient id="battGlassBody" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(255,255,255,0.03)"/><stop offset="15%" stop-color="rgba(255,255,255,0.22)"/><stop offset="33%" stop-color="rgba(255,255,255,0.05)"/><stop offset="50%" stop-color="rgba(255,255,255,0)"/><stop offset="67%" stop-color="rgba(255,255,255,0.05)"/><stop offset="85%" stop-color="rgba(255,255,255,0.18)"/><stop offset="100%" stop-color="rgba(255,255,255,0.03)"/></linearGradient>
         <linearGradient id="battFillHighlight" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(255,255,255,0.02)"/><stop offset="20%" stop-color="rgba(255,255,255,0.22)"/><stop offset="48%" stop-color="rgba(255,255,255,0.44)"/><stop offset="60%" stop-color="rgba(255,255,255,0.12)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></linearGradient>
-        ${dual?`<clipPath id="battBodyClipLeft"><rect x="53" y="145" width="30" height="118" rx="6"/></clipPath><clipPath id="battBodyClipRight"><rect x="85" y="145" width="30" height="118" rx="6"/></clipPath>`:`<clipPath id="battBodyClip"><rect x="53" y="145" width="62" height="118" rx="8"/></clipPath>`}
+        ${dual ? `<clipPath id="battBodyClipLeft"><rect x="53" y="145" width="30" height="118" rx="6"/></clipPath><clipPath id="battBodyClipRight"><rect x="85" y="145" width="30" height="118" rx="6"/></clipPath>` : `<clipPath id="battBodyClip"><rect x="53" y="145" width="62" height="118" rx="8"/></clipPath>`}
         <filter id="battGlowRed"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         <filter id="battGlowOrange"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         <filter id="battGlowGreen"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
@@ -860,7 +860,7 @@ class NexaFlowCard extends HTMLElement {
         <circle id="moonDot" cx="260" cy="72" r="6" fill="rgba(220,235,255,.92)" stroke="rgba(240,248,255,.9)" stroke-width="1.2"/>
       </g>
       <rect id="arcPvLabelRect" x="162" y="22" width="96" height="26" rx="13" fill="rgba(255,200,50,.22)" stroke="rgba(255,210,60,.5)" stroke-width="1.2"/>
-      <text id="arcPvLabelText" x="210" y="39" text-anchor="middle" fill="rgba(255,235,110,.98)" font-size="13" font-weight="800">0 W âš¡</text>
+      <text id="arcPvLabelText" x="210" y="39" text-anchor="middle" fill="rgba(255,235,110,.98)" font-size="13" font-weight="800">0 W ⚡</text>
       <g id="pvFlowGroup"></g>
 
       ${battGhostPath}
@@ -874,7 +874,6 @@ class NexaFlowCard extends HTMLElement {
 
       <path id="flowInvLoad" d="M 260,358 V 265" fill="none" stroke="#29c4f6" stroke-width="3" stroke-linecap="round" stroke-dasharray="14 10" opacity="0" style="display:none"><animate attributeName="stroke-dashoffset" from="-24" to="0" dur="0.8s" repeatCount="indefinite"/></path>
 
-      <!-- Battery current/power placed above/below flow bar -->
       ${showBatt1 ? (dual ? battTextDual : battTextSingle) : ''}
 
       ${battIconSection}
@@ -886,7 +885,7 @@ class NexaFlowCard extends HTMLElement {
 
       <rect id="fcInvRect" x="205" y="155" width="110" height="110" rx="18" fill="#161b22" stroke="#f4a93b" stroke-width="4"/>
       <text id="invNameLabel" x="260" y="203" text-anchor="middle" font-size="14" font-weight="800" fill="#f4a93b" letter-spacing="1">INV</text>
-      <text id="invTempFlow" x="260" y="222" text-anchor="middle" font-size="12" font-weight="700" fill="#58a6ff">-- Â°C</text>
+      <text id="invTempFlow" x="260" y="222" text-anchor="middle" font-size="12" font-weight="700" fill="#58a6ff">-- °C</text>
       <text id="invLoadPctFlow" x="260" y="240" text-anchor="middle" font-size="12" font-weight="700" fill="#3ce878">--%</text>
 
       <text id="pv1label" x="8" y="360" font-size="9" fill="#8b949e" letter-spacing="1">PV1</text>
@@ -907,8 +906,8 @@ class NexaFlowCard extends HTMLElement {
       </div>
       <div class="dv"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:5px">
-        <div class="st"><div class="l">${this.config.label_cell_temp_minmax || 'CELL TEMP MIN/MAX'}</div><div class="v" id="bTemp1">-- Â°C</div></div>
-        <div class="st"><div class="l">${this.config.label_bms_temp || 'BMS TEMP'}</div><div class="v" id="bTemp2">-- Â°C</div></div>
+        <div class="st"><div class="l">${this.config.label_cell_temp_minmax || 'CELL TEMP MIN/MAX'}</div><div class="v" id="bTemp1">-- °C</div></div>
+        <div class="st"><div class="l">${this.config.label_bms_temp || 'BMS TEMP'}</div><div class="v" id="bTemp2">-- °C</div></div>
         <div class="st"><div class="l">${this.config.label_total_pv_gen || 'TOTAL PV GEN.'}</div><div class="v" id="bTotalPvGen">-- kWh</div></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:4px">
@@ -930,12 +929,12 @@ class NexaFlowCard extends HTMLElement {
         </div>
       </div>
       <div class="dv"></div>
-      <div class="ct">â˜€ï¸ Inverter</div>
+      <div class="ct">☀️ Inverter</div>
       <div class="pvf">
-        <div class="pvi"><div class="ico">â˜€ï¸</div><div class="lbl">Today PV</div><div class="val yw" id="invTodayPv">-- kWh</div></div>
-        <div class="pvi"><div class="ico">ðŸ”‹</div><div class="lbl">Chg / Dis</div><div class="val" id="invTodayBattChg">-- kWh</div><div class="val" id="invTodayBattDis" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
-        <div class="pvi"><div class="ico">âš¡</div><div class="lbl">Remaining</div><div class="val" id="invRemCap">-- Ah</div><div class="val" id="invRemKwh" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
-        <div class="pvi"><div class="ico">ðŸ¡</div><div class="lbl">Today Load</div><div class="val" id="invTodayLoad">-- kWh</div></div>
+        <div class="pvi"><div class="ico">☀️</div><div class="lbl">Today PV</div><div class="val yw" id="invTodayPv">-- kWh</div></div>
+        <div class="pvi"><div class="ico">🔋</div><div class="lbl">Chg / Dis</div><div class="val" id="invTodayBattChg">-- kWh</div><div class="val" id="invTodayBattDis" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
+        <div class="pvi"><div class="ico">⚡</div><div class="lbl">Remaining</div><div class="val" id="invRemCap">-- Ah</div><div class="val" id="invRemKwh" style="font-size:.62rem;color:#8b949e;margin-top:1px">-- kWh</div></div>
+        <div class="pvi"><div class="ico">🏠</div><div class="lbl">Today Load</div><div class="val" id="invTodayLoad">-- kWh</div></div>
       </div>
     </div>`;
   }
@@ -969,10 +968,10 @@ class NexaFlowCard extends HTMLElement {
     const todayPv = this._val(this.config.today_pv) || 0;
     const todayBattChg = this._val(this.config.today_batt_chg) || 0;
     const todayLoad = this._val(this.config.today_load) || 0;
-    const battSoc1 = this._val(this.config.battery_soc) || this._val(this.config.fallback_battery_soc) || 0;
+    const battSoc1 = this._val(this.config.battery_soc) || this._val(this.config.goodwe_battery_soc) || 0;
     let battPwr1 = this._val(this.config.battery_power) || 0;
     if (this.config.invert_battery_power) battPwr1 = -battPwr1;
-    let battCurr1 = this._val(this.config.battery_current) || this._val(this.config.fallback_battery_curr) || 0;
+    let battCurr1 = this._val(this.config.battery_current) || this._val(this.config.goodwe_battery_curr) || 0;
     if (this.config.invert_battery_power) battCurr1 = -battCurr1;
     const battVolt1 = this._val(this.config.battery_voltage) || 0;
     const temp1_1 = this._val(this.config.battery_temp1) || 0;
@@ -983,7 +982,7 @@ class NexaFlowCard extends HTMLElement {
     const battDis1 = this._val(this.config.batt_dis) || 0;
     const invTemp = this._val(this.config.inv_temp) || 0;
 
-    // System limits â€“ direct numbers
+    // System limits — direct numbers
     const fullAh = Number(this.config.battery_full_ah) || 314;
     const fullWh = Number(this.config.battery_full_wh) || 16076;
     const invMax = Number(this.config.inverter_max_power) || 6000;
@@ -1017,7 +1016,7 @@ class NexaFlowCard extends HTMLElement {
       if (moonGroup) moonGroup.setAttribute('opacity', '1');
     } else { if (moonGroup) moonGroup.setAttribute('opacity', '0'); }
 
-    const pvTxt = (pvTotal >= 1000 ? (pvTotal / 1000).toFixed(2) + ' kW' : pvTotal.toFixed(0) + ' W') + ' âš¡';
+    const pvTxt = (pvTotal >= 1000 ? (pvTotal / 1000).toFixed(2) + ' kW' : pvTotal.toFixed(0) + ' W') + ' ⚡';
     const pvLabelRect = getEl('arcPvLabelRect');
     const pvLabelText = getEl('arcPvLabelText');
     if (pvLabelRect) { pvLabelRect.setAttribute('x', sun.t < 0.5 ? Math.max(4, sun.bx - 108) : Math.min(sun.bx + 14, 420)); pvLabelRect.setAttribute('y', Math.max(2, sun.by - 28)); }
@@ -1046,20 +1045,22 @@ class NexaFlowCard extends HTMLElement {
     let battLineColor = '#8b949e', battDur = '4.0s', battShowIn = false, battShowOut = false;
     if (absPwr1 < 10) { battShowIn = false; battShowOut = false; }
     else if (absPwr1 < 50) { battShowIn = showBattIn; battShowOut = showBattOut; battLineColor = '#8b949e'; }
-    else { battShowIn = showBattIn; battShowOut = showBattOut; battDur = flowDur(absPwr1);
+    else {
+      battShowIn = showBattIn; battShowOut = showBattOut; battDur = flowDur(absPwr1);
       if (isCharging1) battLineColor = '#2b59ff';
       else if (absPwr1 < 1000) battLineColor = '#f39c4b';
       else if (absPwr1 < 2500) battLineColor = '#e67e22';
-      else battLineColor = '#f85149'; }
+      else battLineColor = '#f85149';
+    }
     setFlow('flowBattIn', battShowIn, absPwr1, battDur, battLineColor);
     setFlow('flowBattOut', battShowOut, absPwr1, battDur, battLineColor);
     setFlow('flowGridIn', gridActive > 10, gridActive, flowDur(gridActive), '#FF2929');
     setFlow('flowGridOut', gridActive < -10, Math.abs(gridActive), flowDur(Math.abs(gridActive)), '#2ecc71');
 
-    // flowInvLoad color â€” matches the dominant source feeding the home load
-    // PV    â†’ #ffe83c  (yellow,  matches PV flow lines)
-    // Batt  â†’ #f39c4b / #e67e22 / #f85149  (orangeâ†’red, matches battLineColor)
-    // Grid  â†’ #FF2929  (red,     matches flowGridIn)
+    // flowInvLoad color — matches the dominant source feeding the home load
+    // PV    → #ffe83c  (yellow,  matches PV flow lines)
+    // Batt  → #f39c4b / #e67e22 / #f85149  (orange→red, matches battLineColor)
+    // Grid  → #FF2929  (red,     matches flowGridIn)
     const absGrid = Math.abs(gridActive > 10 ? gridActive : 0);  // only count grid import
     const absBattOut = battPwr1 < -10 ? Math.abs(battPwr1) : 0;  // only count discharge
     const absPvLoad = pvTotal > 10 ? pvTotal : 0;
@@ -1067,7 +1068,7 @@ class NexaFlowCard extends HTMLElement {
     if (absGrid >= absPvLoad && absGrid >= absBattOut && absGrid > 10) {
       loadFlowColor = '#FF2929'; // grid dominant
     } else if (absBattOut >= absPvLoad && absBattOut >= absGrid && absBattOut > 10) {
-      // battery dominant â€” mirror battLineColor scale
+      // battery dominant — mirror battLineColor scale
       loadFlowColor = absBattOut < 1000 ? '#f39c4b' : absBattOut < 2500 ? '#e67e22' : '#f85149';
     } else {
       loadFlowColor = '#ffe83c'; // PV dominant
@@ -1100,8 +1101,8 @@ class NexaFlowCard extends HTMLElement {
       const bolt1 = getEl('battBoltGroup1'), bolt2 = getEl('battBoltGroup2');
       if (bolt1) bolt1.setAttribute('opacity', (battPwr1 > 10 && absPwr1 >= 10) ? '1' : '0');
       if (bolt2) bolt2.setAttribute('opacity', (battPwr2 > 10 && Math.abs(battPwr2) >= 10) ? '1' : '0');
-      setText('bTemp1', temp1_1.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' Â°C');
-      setText('bTemp2', mos1.toFixed(1) + ' / ' + mos2.toFixed(1) + ' Â°C');
+      setText('bTemp1', temp1_1.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' °C');
+      setText('bTemp2', mos1.toFixed(1) + ' / ' + mos2.toFixed(1) + ' °C');
       // bMinCell, bMaxCell, bBattDis handled by label override block below
     } else {
       const fill = this._battFill(battSoc1);
@@ -1112,12 +1113,12 @@ class NexaFlowCard extends HTMLElement {
       setText('battPwrFlow', absPwr1.toFixed(0) + ' W');
       setText('battCurrFlow', battCurr1.toFixed(1) + ' A');
       const bolt = getEl('battBoltGroup'); if (bolt) bolt.setAttribute('opacity', (battPwr1 > 10 && absPwr1 >= 10) ? '1' : '0');
-      setText('bTemp1', temp1_1.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' Â°C');
-      setText('bTemp2', mos1.toFixed(1) + ' Â°C');
+      setText('bTemp1', temp1_1.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' °C');
+      setText('bTemp2', mos1.toFixed(1) + ' °C');
       // bMinCell, bMaxCell, bBattDis handled by label override block below
     }
 
-    // Color and value for cell tiles â€” handled by label override block below
+    // Color and value for cell tiles — handled by label override block below
 
     setText('bHealth', battHealth + ' %');
     setText('bCycles', battCycles);
@@ -1127,7 +1128,7 @@ class NexaFlowCard extends HTMLElement {
     const _socPct = (remCap1 / fullAh) * 100;
     if (dual) {
       const remCap2 = (battSoc2 / 100) * fullAh;
-      const totalRemWh = (remCap1/fullAh*fullWh) + (remCap2/fullAh*fullWh);
+      const totalRemWh = (remCap1 / fullAh * fullWh) + (remCap2 / fullAh * fullWh);
       const totalPower = battPwr1 + battPwr2;
       if (totalPower < -10) {
         endHours = totalRemWh / Math.abs(totalPower);
@@ -1151,7 +1152,7 @@ class NexaFlowCard extends HTMLElement {
     // Total PV Generation stat tile
     const _totalPvGenEl = getEl('bTotalPvGen');
     if (_totalPvGenEl) {
-      const totalPvGenEntity = this.config.total_pv_gen_entity || 'sensor.growatt_total_pv_generation';
+      const totalPvGenEntity = this.config.total_pv_gen_entity || 'sensor.goodwe_total_pv_generation';
       const totalPvGenState = this._hass && this._hass.states[totalPvGenEntity];
       if (totalPvGenState) {
         const val = parseFloat(totalPvGenState.state);
@@ -1183,13 +1184,13 @@ class NexaFlowCard extends HTMLElement {
       }
     }
 
-    setText('invTempFlow', invTemp.toFixed(1) + ' Â°C');
+    setText('invTempFlow', invTemp.toFixed(1) + ' °C');
     setText('invNameLabel', this.config.inverter_name || 'INV');
     setAttr('invTempFlow', 'fill', invTemp <= 45 ? '#58a6ff' : invTemp <= 55 ? '#f39c4b' : '#f85149');
     const invLoadPct = Math.min(load / invMax * 100, 100).toFixed(0);
     setText('invLoadPctFlow', invLoadPct + '%'); setAttr('invLoadPctFlow', 'fill', invLoadPct <= 50 ? '#3fb950' : '#f39c4b');
 
-    const gridDir = gridActive > 10 ? 'â–¼ ' : gridActive < -10 ? 'â–² ' : '';
+    const gridDir = gridActive > 10 ? '▼ ' : gridActive < -10 ? '▲ ' : '';
     setText('fcGridVal', gridDir + Math.abs(gridActive).toFixed(0) + ' W');
     setAttr('fcGridVal', 'fill', gridActive > 10 ? '#FF2929' : gridActive < -10 ? '#2ecc71' : '#3a3a3a');
     setText('gridImportVal', gridImport.toFixed(2) + ' kWh');
@@ -1212,7 +1213,7 @@ class NexaFlowCard extends HTMLElement {
     setText('invTodayBattChg', todayBattChg + ' kWh');
     setText('invTodayBattDis', battDis1 + ' kWh');
     setText('invTodayLoad', todayLoad + ' kWh');
-    // â”€â”€ Remaining Ah + kWh â”€â”€
+    // ─── Remaining Ah + kWh ───
     const totalRemAh = remCap1 + (dual ? (battSoc2 / 100) * fullAh : 0);
     const avgVolt = dual && battVolt2 > 0 ? (battVolt1 + battVolt2) / 2 : battVolt1;
     const totalRemKwh = avgVolt > 0 ? (totalRemAh * avgVolt / 1000) : null;
@@ -1225,24 +1226,24 @@ class NexaFlowCard extends HTMLElement {
       invRemKwhEl.style.color = remColor;
     }
 
-    // â”€â”€ Label entity overrides for stat tiles â”€â”€
-    // Per-row: override active only when global gate ON AND label text â‰  its default
+    // ─── Label entity overrides for stat tiles ───
+    // Per-row: override active only when global gate ON AND label text ≠ its default
     const labelsOn = !!(this.config._labels_custom_entities);
     const _rowActive = (labelKey, def) => labelsOn && (this.config[labelKey] || def) !== def;
-    const _readNum  = (entityKey, fallback) => {
+    const _readNum = (entityKey, fallback) => {
       const s = this._hass && this._hass.states[this.config[entityKey]];
       return s ? parseFloat(s.state) || fallback : fallback;
     };
-    const _readStr  = (entityKey, fallback) => {
+    const _readStr = (entityKey, fallback) => {
       const s = this._hass && this._hass.states[this.config[entityKey]];
       return s ? s.state : fallback;
     };
-    // Cell temp â€” single entity replaces entire temp1/temp2 display when active
+    // Cell temp — single entity replaces entire temp1/temp2 display when active
     const cellTempCustom = _rowActive('label_cell_temp_minmax', 'CELL TEMP MIN/MAX') && this.config.label_entity_cell_temp;
-    const temp1Final  = cellTempCustom ? _readNum('label_entity_cell_temp', temp1_1) : temp1_1;
+    const temp1Final = cellTempCustom ? _readNum('label_entity_cell_temp', temp1_1) : temp1_1;
     // BMS temp
-    const mosFinal    = (_rowActive('label_bms_temp', 'BMS TEMP')  && this.config.label_entity_bms_temp)
-      ? _readNum('label_entity_bms_temp', mos1)   : mos1;
+    const mosFinal = (_rowActive('label_bms_temp', 'BMS TEMP') && this.config.label_entity_bms_temp)
+      ? _readNum('label_entity_bms_temp', mos1) : mos1;
     // Min cell
     const minCellFinal = (_rowActive('label_min_cell', 'Min Cell') && this.config.label_entity_min_cell)
       ? _readNum('label_entity_min_cell', minCell1) : minCell1;
@@ -1256,19 +1257,19 @@ class NexaFlowCard extends HTMLElement {
     const _bT1o = getEl('bTemp1');
     if (_bT1o) {
       if (cellTempCustom) {
-        _bT1o.textContent = temp1Final.toFixed(1) + ' Â°C';
+        _bT1o.textContent = temp1Final.toFixed(1) + ' °C';
         _bT1o.style.color = this._cellTempColor(temp1Final);
       } else {
-        _bT1o.textContent = temp1Final.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' Â°C';
+        _bT1o.textContent = temp1Final.toFixed(1) + ' / ' + temp2_1.toFixed(1) + ' °C';
         _bT1o.style.color = this._cellTempColor(Math.max(temp1Final, temp2_1));
       }
     }
-    const _bT2o = getEl('bTemp2'); if (_bT2o) { _bT2o.textContent = mosFinal.toFixed(1) + (dual ? ' / ' + mos2.toFixed(1) : '') + ' Â°C'; _bT2o.style.color = this._cellTempColor(dual ? Math.max(mosFinal, mos2) : mosFinal); }
+    const _bT2o = getEl('bTemp2'); if (_bT2o) { _bT2o.textContent = mosFinal.toFixed(1) + (dual ? ' / ' + mos2.toFixed(1) : '') + ' °C'; _bT2o.style.color = this._cellTempColor(dual ? Math.max(mosFinal, mos2) : mosFinal); }
     const _bMno = getEl('bMinCell'); if (_bMno) { _bMno.textContent = minCellFinal.toFixed(3) + ' V'; _bMno.style.color = this._cellVoltColor(minCellFinal); }
     const _bMxo = getEl('bMaxCell'); if (_bMxo) { _bMxo.textContent = maxCellFinal.toFixed(3) + ' V'; _bMxo.style.color = this._cellVoltColor(maxCellFinal); }
     const _bDiso = getEl('bBattDis'); if (_bDiso) _bDiso.textContent = battDisFinal + ' kWh';
 
-    // â”€â”€ HTML stat tile â€” endurance â”€â”€
+    // ─── HTML stat tile — endurance ───
     const _tillStr = this._fmtTill(endHours);
     const _bEnduStat = getEl('bEnduranceStat');
     if (_bEnduStat) { _bEnduStat.textContent = (isETA ? 'ETA ' : '') + endText; _bEnduStat.style.color = endColor; }
@@ -1332,6 +1333,6 @@ window.customCards.push({
   name: 'Nexa Flow Card',
   description: 'Solar Energy Flow Card',
   preview: true,
-  version: '7.4.0',
+  version: '1.0.0',
 });
 customElements.define('nexa-flow-card', NexaFlowCard);

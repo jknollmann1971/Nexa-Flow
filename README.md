@@ -1,7 +1,7 @@
-﻿# nexa-flow-card
+# nexa-flow-card
 
 **Khan Automation â€” Home Assistant Custom Energy Flow Card**
-`nexa-flow-card.js` Â· Unified Edition **V7.4.0**
+`nexa-flow-card.js` Â· Unified Edition **V1.0.0**
 <img width="1708" height="2520" alt="IMG_20260513_114249" src="https://github.com/user-attachments/assets/e4c54570-5b9e-43c4-9326-b44d4105a5d1" />
 <img width="1108" height="1688" alt="IMG_20260516_011350" src="https://github.com/user-attachments/assets/6914d4ab-daa6-432a-983d-6abac15a1cac" />
 <img width="1114" height="1744" alt="IMG_20260516_011300" src="https://github.com/user-attachments/assets/ce97703f-ed71-4ab9-a79d-8d7cf3bcd3f6" />
@@ -83,6 +83,8 @@ All keys are configured through the visual editor. The YAML equivalents are list
 | Key | Default | Description |
 |---|---|---|
 | `inverter_name` | `''` | Label shown in the inverter node |
+| `nexa_work_mode` | `sensor.growatt_0hvrb0zr23jt00yy_work_mode` | Work Mode Sensor |
+| `nexa_island_mode` | `switch.growatt_0hvrb0zr23jt00yy_island_mode_enabled` | Island Mode Switch |
 | `pv1_power` | `sensor.Growatt Nexa_pv1_power` | PV string 1 power (W) |
 | `pv2_power` | `sensor.Growatt Nexa_pv2_power` | PV string 2 power (W) |
 | `pv3_power` | `''` | PV string 3 â€” optional, enable via Extra PV toggle |
@@ -116,6 +118,8 @@ All keys are configured through the visual editor. The YAML equivalents are list
 | `battery_power` | `sensor.growatt_power` | Battery power (W) |
 | `battery_current` | `sensor.growatt_current` | Battery current (A) |
 | `battery_voltage` | `sensor.growatt_voltage` | Battery voltage (V) |
+| `nexa_batt_health` | `sensor.growatt_0hvrb0zr23jt00yy_battery_health` | Battery Health (%) |
+| `nexa_batt_cycles` | `sensor.growatt_0hvrb0zr23jt00yy_battery_cycle_count` | Battery Cycles |
 | `battery_temp1` | `sensor.growatt_temp1` | Cell temp probe 1 |
 | `battery_temp2` | `sensor.growatt_temp2` | Cell temp probe 2 |
 | `battery_mos` | `sensor.growatt_mos` | BMS MOS temperature |
@@ -209,7 +213,7 @@ All keys are configured through the visual editor. The YAML equivalents are list
 
 ## Changelog
 
-### v7.4.0
+### v1.0.0
 - **Labels section â€” header chip toggle** (same style as Secondary Battery, Extra PV, EV, Limits sections). Body is hidden when disabled.
 - **Per-row auto-enable logic:** each label row's entity picker activates independently â€” only when that row's text has been changed from its default value. No global unlock needed.
 - **Per-row Battery/Solar locking:** corresponding pickers in Battery and Solar Extras sections lock individually when their label row is active, not all-at-once.
@@ -385,5 +389,5 @@ When reporting an issue, include:
 
 ---
 
-*Khan Automation Â· nexa-flow-card Â· Last updated: v7.4.0*
+*Khan Automation Â· nexa-flow-card Â· Last updated: v1.0.0*
 
