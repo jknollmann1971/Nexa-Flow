@@ -51,15 +51,18 @@ The card combines an SVG energy-flow canvas (sun arc, animated flow paths, inver
 
 ---
 
-### Method 2 â€” Manual
+### Method 2 — Manual
 
-1. Copy `nexa-flow-card.js` to your HA config folder:
+1. Copy `nexa-flow-card.js` and the three icon files (`ev-charger-icon.png`, `grid-icon.png`, and `home-icon.png`) from the `dist` directory to your HA config folder:
    ```
    /config/www/nexa-flow-card.js
+   /config/www/ev-charger-icon.png
+   /config/www/grid-icon.png
+   /config/www/home-icon.png
    ```
 
 2. Register as a Lovelace resource:
-   *(Settings â†’ Dashboards â†’ Resources â†’ Add)*
+   *(Settings → Dashboards → Resources → Add)*
    ```yaml
    url: /local/nexa-flow-card.js
    type: module
